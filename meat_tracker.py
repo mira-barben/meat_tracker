@@ -58,8 +58,8 @@ if not df.empty:
     # Resample by day and count the meat-eating events
     df_resampled = df.resample('D').size()
 
-    # Get the earliest date from the data as the start date
-    start_date = df_resampled.index.min()  # This will get the earliest date in your data
+    # Ensure we have data starting from March 2025 (or earliest date)
+    start_date = pd.to_datetime('2025-03-01')  # Start date can be changed as required
     all_dates = pd.date_range(start=start_date, end=datetime.today(), freq='D')
     df_resampled = df_resampled.reindex(all_dates, fill_value=0)  # Fill missing dates with 0
 
@@ -83,3 +83,4 @@ if st.sidebar.button("Reset Data"):
     df = pd.DataFrame(columns=['date'])
     save_data(df)
     st.sidebar.success("Data has been reset!")
+
