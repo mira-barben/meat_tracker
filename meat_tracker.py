@@ -12,9 +12,9 @@ def load_data():
         # Create an empty DataFrame if the file doesn't exist
         df = pd.DataFrame(columns=['date'])
     
-    # Ensure the 'date' column is of datetime type and normalize it (remove time)
+    # Ensure the 'date' column is of datetime type and strip any time information
     if 'date' in df.columns:
-        df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.normalize()  # Normalize to remove time part
+        df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.normalize()  # Stripping time part
     return df
 
 # Save the data to a CSV
@@ -24,6 +24,8 @@ def save_data(df):
 # Function to update meat-eating log
 def add_meat_day(date, df):
     # Add new meat day entry (allowing for multiple entries per day)
+    # Make sure the date has no time part
+    date = pd.to_datetime(date).normalize()  # Normalize to ensure no time component
     new_row = pd.DataFrame({'date': [date]})
     df = pd.concat([df, new_row], ignore_index=True)
     return df
@@ -50,14 +52,15 @@ if st.sidebar.button("Log"):
 st.subheader("Timeseries")
 if not df.empty:
     # Ensure the 'date' column is datetime and set it as the index
-    df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.normalize()  # Normalize to remove time part
+    df['date'] = pd.to_datetime(df['date'])
     df.set_index('date', inplace=True)
     
     # Resample by day and count the meat-eating events
     df_resampled = df.resample('D').size()
 
-    # Ensure we have data up to today's date
-    all_dates = pd.date_range(df_resampled.index.min(), datetime.today(), freq='D')
+    # Ensure we have data starting from March 2025 (or earliest date)
+    start_date = pd.to_datetime('2025-03-01')  # Start date can be changed as required
+    all_dates = pd.date_range(start=start_date, end=datetime.today(), freq='D')
     df_resampled = df_resampled.reindex(all_dates, fill_value=0)  # Fill missing dates with 0
 
     plt.figure(figsize=(10, 6))
@@ -66,6 +69,7 @@ if not df.empty:
     # Make sure the Y-axis has whole numbers
     plt.yticks(range(0, int(df_resampled.max()) + 1))
 
+    # Ensure dates on the x-axis are formatted properly (without time)
     plt.xlabel("Date")
     plt.ylabel("Number of Meat-Eating Events")
     plt.xticks(rotation=45)
@@ -78,6 +82,8 @@ if st.sidebar.button("Reset Data"):
     # Clear the meat_eating_log.csv file by overwriting it with an empty DataFrame
     df = pd.DataFrame(columns=['date'])
     save_data(df)
+    st.sidebar.success("Data has been reset!")
+
     st.sidebar.success("Data has been reset!")
 
 
