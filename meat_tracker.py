@@ -12,9 +12,9 @@ def load_data():
         # Create an empty DataFrame if the file doesn't exist
         df = pd.DataFrame(columns=['date'])
     
-    # Ensure the 'date' column is of datetime type
+    # Ensure the 'date' column is of datetime type and normalize it (remove time)
     if 'date' in df.columns:
-        df['date'] = pd.to_datetime(df['date'], errors='coerce')
+        df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.normalize()  # Normalize to remove time part
     return df
 
 # Save the data to a CSV
@@ -49,8 +49,8 @@ if st.sidebar.button("Log"):
 # Display the data
 st.subheader("Timeseries")
 if not df.empty:
-    # Make sure the 'date' column is datetime and set it as the index
-    df['date'] = pd.to_datetime(df['date'])
+    # Ensure the 'date' column is datetime and set it as the index
+    df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.normalize()  # Normalize to remove time part
     df.set_index('date', inplace=True)
     
     # Resample by day and count the meat-eating events
@@ -66,7 +66,6 @@ if not df.empty:
     # Make sure the Y-axis has whole numbers
     plt.yticks(range(0, int(df_resampled.max()) + 1))
 
-    #plt.title("Number of Meat-Eating Events Over Time")
     plt.xlabel("Date")
     plt.ylabel("Number of Meat-Eating Events")
     plt.xticks(rotation=45)
@@ -80,4 +79,5 @@ if st.sidebar.button("Reset Data"):
     df = pd.DataFrame(columns=['date'])
     save_data(df)
     st.sidebar.success("Data has been reset!")
+
 
