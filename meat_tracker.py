@@ -14,7 +14,7 @@ def load_data():
     
     # Ensure the 'date' column is of datetime type and strip any time information
     if 'date' in df.columns:
-        df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.normalize()  # Stripping time part
+        df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.normalize()  
     return df
 
 # Save the data to a CSV
@@ -24,8 +24,7 @@ def save_data(df):
 # Function to update meat-eating log
 def add_meat_day(date, df):
     # Add new meat day entry (allowing for multiple entries per day)
-    # Make sure the date has no time part
-    date = pd.to_datetime(date).normalize()  # Normalize to ensure no time component
+    date = pd.to_datetime(date).normalize()  
     new_row = pd.DataFrame({'date': [date]})
     df = pd.concat([df, new_row], ignore_index=True)
     return df
@@ -49,7 +48,7 @@ if st.sidebar.button("Log"):
     st.sidebar.success(f"{meat_events_input} meat-eating events added for {meat_day_input}!")
 
 # Display the data
-st.subheader("Timeseries")
+#st.subheader("Timeseries")
 if not df.empty:
     # Ensure the 'date' column is datetime and set it as the index
     df['date'] = pd.to_datetime(df['date'])
@@ -58,19 +57,57 @@ if not df.empty:
     # Resample by day and count the meat-eating events
     df_resampled = df.resample('D').size()
 
-    # Ensure we have data starting from March 2025 (or earliest date)
-    start_date = pd.to_datetime('2025-03-01')  # Start date can be changed as required
+    # Set start date of logger
+    start_date = pd.to_datetime('2025-03-01')  
     all_dates = pd.date_range(start=start_date, end=datetime.today(), freq='D')
     df_resampled = df_resampled.reindex(all_dates, fill_value=0)  # Fill missing dates with 0
 
+    # Calculate streaks
+    today = pd.Timestamp(datetime.today().date())
+
+    # Helper: get days with meat
+    meat_days = df_resampled[df_resampled > 0]
+
+    # --- Current streak ---
+    if df_resampled.index[-1] == today and df_resampled[today] > 0:
+        current_streak = 0
+    else:
+        streak = 0
+        for date in reversed(df_resampled.index):
+            if date > today:
+                continue
+            if df_resampled[date] == 0:
+                streak += 1
+            else:
+                break
+        current_streak = streak
+
+    # --- Longest streak ---
+    longest_streak = 0
+    streak = 0
+    for val in df_resampled.values:
+        if val == 0:
+            streak += 1
+            longest_streak = max(longest_streak, streak)
+        else:
+            streak = 0
+
+    # Display achievements next to the chart
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric("🥗 Days without meat", f"{current_streak} days")
+
+    with col2:
+        st.metric("🏆 Longest streak", f"{longest_streak} days")
+
+
     plt.figure(figsize=(10, 6))
     plt.plot(df_resampled.index, df_resampled.values, marker='o', color='blue', label='Meat-eating events')
-
-    # Make sure the Y-axis has whole numbers
     plt.yticks(range(0, int(df_resampled.max()) + 1))
 
-    # Ensure dates on the x-axis are formatted properly (without time)
-    plt.xlabel("Date")
+    # Axis formatting
+    plt.xlabel("Time")
     plt.ylabel("Number of Meat-Eating Events")
     plt.xticks(rotation=45)
     plt.tight_layout()
@@ -83,4 +120,5 @@ if st.sidebar.button("Reset Data"):
     df = pd.DataFrame(columns=['date'])
     save_data(df)
     st.sidebar.success("Data has been reset!")
+
 
