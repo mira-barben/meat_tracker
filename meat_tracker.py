@@ -58,7 +58,7 @@ if not df.empty:
     df_resampled = df.resample('D').size()
 
     # Set start date of logger
-    start_date = pd.to_datetime('2025-03-01')  
+    start_date = pd.to_datetime('2025-02-10')  
     all_dates = pd.date_range(start=start_date, end=datetime.today(), freq='D')
     df_resampled = df_resampled.reindex(all_dates, fill_value=0)  # Fill missing dates with 0
 
