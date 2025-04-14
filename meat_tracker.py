@@ -12,12 +12,12 @@ import json
 def init_drive():
     gauth = GoogleAuth()
 
-    # Load credentials from Streamlit secrets
-    client_config_dict = json.loads(st.secrets["google"]["client_config"])
-    gauth.LoadClientConfig(settings=None, config=client_config_dict)
+    # Manually set client config from secrets
+    gauth.settings['client_config'] = json.loads(st.secrets["google"]["client_config"])
     gauth.LocalWebserverAuth()
 
     return GoogleDrive(gauth)
+
 
 drive = init_drive()
 
