@@ -10,8 +10,9 @@ import json
 def init_drive():
     gauth = GoogleAuth()
 
-    # Try loading client config from a local file (replace with your path)
-    gauth.LoadClientConfigFile('client_secrets.json')
+    # Load the client configuration from Streamlit secrets and parse it as a dictionary
+    client_config = json.loads(st.secrets["google"]["client_config"])
+    gauth.settings['client_config'] = client_config
 
     # Try LocalWebserverAuth for environments with a browser
     try:
