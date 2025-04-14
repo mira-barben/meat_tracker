@@ -107,14 +107,14 @@ if username:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
         # --- Plotting ---
-        """plt.figure(figsize=(10, 6))
-        plt.plot(df_resampled.index, df_resampled.values, marker='o', color='blue')
-        plt.yticks(range(0, int(df_resampled.max()) + 1))
-        plt.xlabel("Time")
-        plt.ylabel("Number of Meat-Eating Events")
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        st.pyplot(plt)"""
+        #plt.figure(figsize=(10, 6))
+        #plt.plot(df_resampled.index, df_resampled.values, marker='o', color='blue')
+        #plt.yticks(range(0, int(df_resampled.max()) + 1))
+        #plt.xlabel("Time")
+        #plt.ylabel("Number of Meat-Eating Events")
+        #plt.xticks(rotation=45)
+        #plt.tight_layout()
+        #st.pyplot(plt)
 
         # --- Plotting (Balkendiagramm) ---
         plt.figure(figsize=(10, 6))
@@ -143,5 +143,3 @@ if username:
         st.rerun()
 else:
     st.warning("Please enter your username in the sidebar to continue.")
-
-
