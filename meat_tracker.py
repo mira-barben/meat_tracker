@@ -63,7 +63,7 @@ if username:
             df = add_meat_day(meat_day_input, df)
         save_data(df, username, existing_file)
         st.sidebar.success(f"{meat_events_input} meat-eating events added for {meat_day_input}!")
-        st.experimental_rerun()
+        st.rerun()
 
     if not df.empty:
         df['date'] = pd.to_datetime(df['date'])
@@ -129,6 +129,7 @@ if username:
         df = pd.DataFrame(columns=['date'])
         save_data(df, username, existing_file)
         st.sidebar.success("Your data has been reset!")
-        st.experimental_rerun()
+        st.rerun()
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
