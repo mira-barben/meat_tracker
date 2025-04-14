@@ -14,10 +14,14 @@ def init_drive():
 
     # Manually set client config from secrets
     gauth.settings['client_config'] = json.loads(st.secrets["google"]["client_config"])
-    gauth.LocalWebserverAuth()
+
+    # Try LocalWebserverAuth for environments with a browser
+    try:
+        gauth.LocalWebserverAuth()  # This will open a browser for authentication
+    except Exception:
+        gauth.CommandLineAuth()  # Fallback to command line authentication in headless environments
 
     return GoogleDrive(gauth)
-
 
 drive = init_drive()
 
@@ -33,6 +37,8 @@ def load_data(username):
         file.GetContentFile(filename)
         df = pd.read_csv(filename)
         df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.normalize()
+        if df['date'].isna().sum() > 0:
+            st.warning("There are invalid date values in your data.")
         return df, file
     else:
         return pd.DataFrame(columns=['date']), None
@@ -112,7 +118,7 @@ if username:
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
-        # --- Plotting (Balkendiagramm / Bar Chart) ---
+        # --- Plotting (Bar Chart) ---
         plt.figure(figsize=(10, 6))
         plt.bar(df_resampled.index, df_resampled.values, color='green')
         plt.yticks(range(0, int(df_resampled.max()) + 1))
