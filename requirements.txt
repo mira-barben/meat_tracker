@@ -1,3 +1,7 @@
 streamlit
 pandas
 matplotlib
+pydrive
+google-auth
+google-auth-oauthlib
+oauth2client
