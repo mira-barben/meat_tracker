@@ -10,6 +10,7 @@ import json
 import json
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+import streamlit as st
 
 def init_drive():
     gauth = GoogleAuth()
@@ -17,8 +18,11 @@ def init_drive():
     # Load the client configuration from Streamlit secrets and parse it as a dictionary
     client_config = json.loads(st.secrets["google"]["client_config"])
 
-    # Directly pass the parsed client config to PyDrive
+    # Directly assign the parsed client config to PyDrive's settings
     gauth.settings['client_config'] = client_config
+
+    # Override the method to skip the file loading step
+    gauth.LoadClientConfigFile = lambda: None  # Bypass loading the client secrets from file
 
     # Try LocalWebserverAuth for environments with a browser
     try:
@@ -28,8 +32,8 @@ def init_drive():
 
     return GoogleDrive(gauth)
 
-
 drive = init_drive()
+
 
 # --- USERNAME SETUP ---
 username = st.sidebar.text_input("Enter your username to access your data")
