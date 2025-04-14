@@ -5,12 +5,18 @@ from datetime import datetime
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import os
+import json
 
 # --- GOOGLE DRIVE SETUP ---
 @st.cache_resource
 def init_drive():
     gauth = GoogleAuth()
+
+    # Load credentials from Streamlit secrets
+    client_config_dict = json.loads(st.secrets["google"]["client_config"])
+    gauth.LoadClientConfig(settings=None, config=client_config_dict)
     gauth.LocalWebserverAuth()
+
     return GoogleDrive(gauth)
 
 drive = init_drive()
@@ -106,17 +112,7 @@ if username:
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
-        # --- Plotting ---
-        #plt.figure(figsize=(10, 6))
-        #plt.plot(df_resampled.index, df_resampled.values, marker='o', color='blue')
-        #plt.yticks(range(0, int(df_resampled.max()) + 1))
-        #plt.xlabel("Time")
-        #plt.ylabel("Number of Meat-Eating Events")
-        #plt.xticks(rotation=45)
-        #plt.tight_layout()
-        #st.pyplot(plt)
-
-        # --- Plotting (Balkendiagramm) ---
+        # --- Plotting (Balkendiagramm / Bar Chart) ---
         plt.figure(figsize=(10, 6))
         plt.bar(df_resampled.index, df_resampled.values, color='green')
         plt.yticks(range(0, int(df_resampled.max()) + 1))
@@ -125,7 +121,6 @@ if username:
         plt.xticks(rotation=45)
         plt.tight_layout()
         st.pyplot(plt)
-
 
         # --- Download Button ---
         st.download_button(
