@@ -90,7 +90,7 @@ if username:
 
         # Plotting
         plt.figure(figsize=(10, 6))
-        plt.plot(df_resampled.index, df_resampled.values, marker='o', color='green', label='Meat-eating events')
+        plt.plot(df_resampled.index, df_resampled.values, marker='o', color='blue', label='Meat-eating events')
         plt.yticks(range(0, int(df_resampled.max()) + 1))
         plt.xlabel("Time")
         plt.ylabel("Number of Meat-Eating Events")
