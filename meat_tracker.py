@@ -48,7 +48,7 @@ def add_meat_day(date, df):
     return pd.concat([df, new_row], ignore_index=True)
 
 # --- MAIN APP ---
-st.title("🥩 Meat-Eating Tracker")
+st.title("Meat-Eating Tracker")
 st.sidebar.header("Tracker Settings")
 
 if username:
@@ -56,7 +56,7 @@ if username:
 
     # Sidebar input for logging
     meat_day_input = st.sidebar.date_input("Select the date you ate meat")
-    meat_events_input = st.sidebar.number_input("How many times did you eat meat on this day?", min_value=1, step=1)
+    meat_events_input = st.sidebar.number_input("How many times did you eat meat on this day?", min_value=0, step=1)
 
     if st.sidebar.button("Log"):
         for _ in range(meat_events_input):
@@ -107,14 +107,25 @@ if username:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
         # --- Plotting ---
-        plt.figure(figsize=(10, 6))
+        """plt.figure(figsize=(10, 6))
         plt.plot(df_resampled.index, df_resampled.values, marker='o', color='blue')
         plt.yticks(range(0, int(df_resampled.max()) + 1))
         plt.xlabel("Time")
         plt.ylabel("Number of Meat-Eating Events")
         plt.xticks(rotation=45)
         plt.tight_layout()
+        st.pyplot(plt)"""
+
+        # --- Plotting (Balkendiagramm) ---
+        plt.figure(figsize=(10, 6))
+        plt.bar(df_resampled.index, df_resampled.values, color='green')
+        plt.yticks(range(0, int(df_resampled.max()) + 1))
+        plt.xlabel("Time")
+        plt.ylabel("Number of Meat-Eating Events")
+        plt.xticks(rotation=45)
+        plt.tight_layout()
         st.pyplot(plt)
+
 
         # --- Download Button ---
         st.download_button(
@@ -132,4 +143,5 @@ if username:
         st.rerun()
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
 
