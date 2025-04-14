@@ -4,16 +4,14 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-import os
 import json
 
 # --- GOOGLE DRIVE SETUP ---
-@st.cache_resource
 def init_drive():
     gauth = GoogleAuth()
 
-    # Manually set client config from secrets
-    gauth.settings['client_config'] = json.loads(st.secrets["google"]["client_config"])
+    # Try loading client config from a local file (replace with your path)
+    gauth.LoadClientConfigFile('client_secrets.json')
 
     # Try LocalWebserverAuth for environments with a browser
     try:
