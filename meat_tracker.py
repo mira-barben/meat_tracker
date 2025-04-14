@@ -2,39 +2,57 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+import os
+
+# --- GOOGLE DRIVE SETUP ---
+@st.cache_resource
+def init_drive():
+    gauth = GoogleAuth()
+    gauth.LocalWebserverAuth()
+    return GoogleDrive(gauth)
+
+drive = init_drive()
 
 # --- USERNAME SETUP ---
 username = st.sidebar.text_input("Enter your username to access your data")
 
 # --- LOAD AND SAVE FUNCTIONS ---
 def load_data(username):
-    filename = f"data_{username}.csv"
-    try:
+    filename = f"{username}.csv"
+    file_list = drive.ListFile({'q': f"title='{filename}' and trashed=false"}).GetList()
+    if file_list:
+        file = file_list[0]
+        file.GetContentFile(filename)
         df = pd.read_csv(filename)
-    except FileNotFoundError:
-        df = pd.DataFrame(columns=['date'])
-    
-    if 'date' in df.columns:
         df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.normalize()
-    return df
+        return df, file
+    else:
+        return pd.DataFrame(columns=['date']), None
 
-def save_data(df, username):
-    filename = f"data_{username}.csv"
+def save_data(df, username, existing_file):
+    filename = f"{username}.csv"
     df.to_csv(filename, index=False)
+    if existing_file:
+        existing_file.SetContentFile(filename)
+        existing_file.Upload()
+    else:
+        new_file = drive.CreateFile({'title': filename})
+        new_file.SetContentFile(filename)
+        new_file.Upload()
 
 def add_meat_day(date, df):
     date = pd.to_datetime(date).normalize()
     new_row = pd.DataFrame({'date': [date]})
-    df = pd.concat([df, new_row], ignore_index=True)
-    return df
+    return pd.concat([df, new_row], ignore_index=True)
 
 # --- MAIN APP ---
-st.title("Meat-Eating Tracker")
+st.title("🥩 Meat-Eating Tracker")
 st.sidebar.header("Tracker Settings")
 
 if username:
-    # Load user data
-    df = load_data(username)
+    df, existing_file = load_data(username)
 
     # Sidebar input for logging
     meat_day_input = st.sidebar.date_input("Select the date you ate meat")
@@ -43,10 +61,10 @@ if username:
     if st.sidebar.button("Log"):
         for _ in range(meat_events_input):
             df = add_meat_day(meat_day_input, df)
-        save_data(df, username)
+        save_data(df, username, existing_file)
         st.sidebar.success(f"{meat_events_input} meat-eating events added for {meat_day_input}!")
+        st.experimental_rerun()
 
-    # --- Display Data ---
     if not df.empty:
         df['date'] = pd.to_datetime(df['date'])
         df.set_index('date', inplace=True)
@@ -58,7 +76,7 @@ if username:
 
         today = pd.Timestamp(datetime.today().date())
 
-        # Current streak
+        # --- Current streak ---
         if df_resampled.index[-1] == today and df_resampled[today] > 0:
             current_streak = 0
         else:
@@ -72,7 +90,7 @@ if username:
                     break
             current_streak = streak
 
-        # Longest streak
+        # --- Longest streak ---
         longest_streak = 0
         streak = 0
         for val in df_resampled.values:
@@ -88,9 +106,9 @@ if username:
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
-        # Plotting
+        # --- Plotting ---
         plt.figure(figsize=(10, 6))
-        plt.plot(df_resampled.index, df_resampled.values, marker='o', color='blue', label='Meat-eating events')
+        plt.plot(df_resampled.index, df_resampled.values, marker='o', color='blue')
         plt.yticks(range(0, int(df_resampled.max()) + 1))
         plt.xlabel("Time")
         plt.ylabel("Number of Meat-Eating Events")
@@ -98,7 +116,7 @@ if username:
         plt.tight_layout()
         st.pyplot(plt)
 
-        # Download Button
+        # --- Download Button ---
         st.download_button(
             label="📥 Download your data as CSV",
             data=df.reset_index().to_csv(index=False).encode('utf-8'),
@@ -106,10 +124,11 @@ if username:
             mime='text/csv'
         )
 
-    # Reset button
+    # --- Reset button ---
     if st.sidebar.button("Reset Data"):
         df = pd.DataFrame(columns=['date'])
-        save_data(df, username)
+        save_data(df, username, existing_file)
         st.sidebar.success("Your data has been reset!")
+        st.experimental_rerun()
 else:
     st.warning("Please enter your username in the sidebar to continue.")
