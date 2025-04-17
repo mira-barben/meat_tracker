@@ -6,30 +6,16 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import json
 
-# --- GOOGLE DRIVE SETUP ---
-import json
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
-import streamlit as st
+# --- GOOGLE DRIVE SETUP (Service Account Auth) ---
+from oauth2client.service_account import ServiceAccountCredentials
 
 def init_drive():
+    scope = ['https://www.googleapis.com/auth/drive']
+    creds_dict = json.loads(st.secrets["google"]["service_account"])
+    credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    
     gauth = GoogleAuth()
-
-    # Load the client configuration from Streamlit secrets and parse it as a dictionary
-    client_config = json.loads(st.secrets["google"]["client_config"])
-
-    # Directly assign the parsed client config to PyDrive's settings
-    gauth.settings['client_config'] = client_config
-
-    # Override the method to skip the file loading step
-    gauth.LoadClientConfigFile = lambda: None  # Bypass loading the client secrets from file
-
-    # Try LocalWebserverAuth for environments with a browser
-    try:
-        gauth.LocalWebserverAuth()  # This will open a browser for authentication
-    except Exception:
-        gauth.CommandLineAuth()  # Fallback to command line authentication in headless environments
-
+    gauth.credentials = credentials
     return GoogleDrive(gauth)
 
 drive = init_drive()
