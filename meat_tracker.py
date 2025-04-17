@@ -116,7 +116,7 @@ if username:
 
         # --- Plotting (Bar Chart) ---
         plt.figure(figsize=(10, 6))
-        plt.bar(df_resampled.index, df_resampled.values, color='green')
+        plt.bar(df_resampled.index, df_resampled.values, color='blue')
         plt.yticks(range(0, int(df_resampled.max()) + 1))
         plt.xlabel("Time")
         plt.ylabel("Number of Meat-Eating Events")
