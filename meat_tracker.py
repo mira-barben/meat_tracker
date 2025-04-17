@@ -11,7 +11,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 def init_drive():
     scope = ['https://www.googleapis.com/auth/drive']
-    creds_dict = json.loads(st.secrets["google"]["service_account"])
+    creds_dict = st.secrets["google"]["service_account"]
     credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     
     gauth = GoogleAuth()
