@@ -134,10 +134,10 @@ if username:
         )
 
     # --- Reset button ---
-    if st.sidebar.button("Reset Data"):
-        df = pd.DataFrame(columns=['date', 'count'])
-        save_data(df, username, existing_file)
-        st.sidebar.success("Your data has been reset!")
-        st.rerun()
+    #if st.sidebar.button("Reset Data"):
+    #    df = pd.DataFrame(columns=['date', 'count'])
+    #    save_data(df, username, existing_file)
+    #    st.sidebar.success("Your data has been reset!")
+    #    st.rerun()
 else:
     st.warning("Please enter your username in the sidebar to continue.")
