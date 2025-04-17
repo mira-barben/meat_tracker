@@ -28,10 +28,18 @@ def load_data(username):
         file = file_list[0]
         file.GetContentFile(filename)
         df = pd.read_csv(filename, parse_dates=['date'])
-        df['date'] = df['date'].dt.normalize()
+
+        # Normalize date format
+        df['date'] = pd.to_datetime(df['date']).dt.normalize()
+
+        # Handle legacy data (no 'count' column)
+        if 'count' not in df.columns:
+            df['count'] = 1  # assume each row was one meat event
+
         return df, file
     else:
         return pd.DataFrame(columns=['date', 'count']), None
+
 
 def save_data(df, username, existing_file):
     filename = f"{username}.csv"
