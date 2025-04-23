@@ -130,12 +130,25 @@ if username:
             'logged': df_grouped.index.isin(df_log_status.index)
         })
         
-        # --- Plotting (Bar Chart with Missing Data Visualization) ---
+        # --- Enrich df_grouped to track "logged" vs "auto-filled" zeros ---
+        df['logged'] = True
+        df_log_status = df.set_index('date')['logged']
+        df_combined = pd.DataFrame({
+            'actual_count': df_grouped,
+            'logged': df_grouped.index.isin(df_log_status.index)
+        })
+        
+        # For visualization only: show missing entries with height 1
+        df_combined['plot_count'] = df_combined.apply(
+            lambda row: row.actual_count if row.logged else 1, axis=1
+        )
+        
+        # --- Plotting (Bar Chart with Missing Data as 1-height bars) ---
         plt.figure(figsize=(12, 6))
         colors = ['green' if row.logged else 'lightgray' for row in df_combined.itertuples()]
-        bars = plt.bar(df_combined.index, df_combined['count'], color=colors)
+        bars = plt.bar(df_combined.index, df_combined['plot_count'], color=colors)
         
-        # Improve x-axis readability
+        # X-axis formatting for clarity
         plt.xticks(
             ticks=pd.date_range(start=start_date, end=today, freq='7D'),
             labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
@@ -143,19 +156,20 @@ if username:
         )
         
         plt.xlabel("Date")
-        plt.ylabel("Number of Meat-Eating Events")
+        plt.ylabel("Number of Meat-Eating Events (visualized)")
         plt.title("Meat Consumption Log")
         plt.tight_layout()
         
         # Add legend manually
         import matplotlib.patches as mpatches
         legend_patches = [
-            mpatches.Patch(color='green', label='Logged Days'),
-            mpatches.Patch(color='lightgray', label='No Entry')
+            mpatches.Patch(color='green', label='Logged'),
+            mpatches.Patch(color='lightgray', label='No Entry (visual placeholder)')
         ]
         plt.legend(handles=legend_patches)
         
         st.pyplot(plt)
+
 
 
         # --- Download Button ---
