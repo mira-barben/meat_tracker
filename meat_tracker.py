@@ -122,68 +122,44 @@ if username:
         #plt.tight_layout()
         #st.pyplot(plt)
 
-        # --- Enrich df_grouped to track "logged" vs "auto-filled" zeros ---
-        df['logged'] = True
-        df_log_status = df.set_index('date')['logged']
-        df_combined = pd.DataFrame({
-            'count': df_grouped,
-            'logged': df_grouped.index.isin(df_log_status.index)
-        })
+        # --- Start with a full date range from start to today ---
+        start_date = pd.to_datetime('2025-02-10')
+        today = pd.Timestamp(datetime.today().date())
+        all_dates = pd.date_range(start=start_date, end=today, freq='D')
         
-        # --- Enrich df_grouped to track "logged" vs "auto-filled" zeros ---
-        df['logged'] = True
-        df_log_status = df.set_index('date')['logged']
-        df_combined = pd.DataFrame({
-            'actual_count': df_grouped,
-            'logged': df_grouped.index.isin(df_log_status.index)
-        })
+        # --- Build base DataFrame with all dates ---
+        df_all = pd.DataFrame(index=all_dates)
+        df_all.index.name = 'date'
+        df_all['actual_count'] = 0  # default = 0 meat events
         
-        # For visualization only: show missing entries with height 1
-        df_combined['plot_count'] = df_combined.apply(
-            lambda row: row.actual_count if row.logged else 1, axis=1
-        )
+        # --- Fill in actual counts where available ---
+        df_all.update(df.set_index('date'))
         
-        # --- Identify which days were explicitly logged (even 0s) ---
-        df_log_status = df.set_index('date')['count']
-        logged_dates = df_log_status.index
+        # --- Determine which dates were explicitly logged (even if 0) ---
+        logged_dates = set(df['date'].dt.normalize())
+        df_all['logged'] = df_all.index.isin(logged_dates)
         
-        # Build DataFrame with actual values
-        df_combined = pd.DataFrame({
-            'actual_count': df_grouped
-        })
-        df_combined['logged'] = df_combined.index.isin(logged_dates)
-        
-        # Visualization-only column:
-        # - show actual value if logged
-        # - show 1 if NOT logged
-        # - show 0 if logged as zero
-        def visual_count(row):
-            if row.logged:
-                return row.actual_count  # could be 0 or more
-            else:
-                return 1  # unlogged days = gray bar at height 1
-        
-        df_combined['plot_count'] = df_combined.apply(visual_count, axis=1)
-        
-        # Color logic:
-        # - green = logged value (count > 0)
-        # - none (no bar) = logged value is 0
-        # - gray = not logged
-        colors = []
-        for i, row in df_combined.iterrows():
-            if row.logged:
-                if row.actual_count > 0:
-                    colors.append('green')
+        # --- Determine plot count and color ---
+        def compute_visual(row):
+            if row['logged']:
+                if row['actual_count'] == 0:
+                    return pd.NA, 'none'  # hide bar
                 else:
-                    colors.append('none')  # no bar
+                    return row['actual_count'], 'green'  # meat-eating day
             else:
-                colors.append('lightgray')
+                return 1, 'lightgray'  # not logged at all
         
-        # Plotting
+        df_all[['plot_count', 'color']] = df_all.apply(compute_visual, axis=1, result_type='expand')
+        
+        # --- Plotting ---
+        import matplotlib.patches as mpatches
         plt.figure(figsize=(12, 6))
-        bars = plt.bar(df_combined.index, df_combined['plot_count'], color=colors)
         
-        # Clean x-axis ticks
+        # Remove "none" entries before plotting
+        mask = df_all['color'] != 'none'
+        plt.bar(df_all.index[mask], df_all.loc[mask, 'plot_count'], color=df_all.loc[mask, 'color'])
+        
+        # X-axis ticks (weekly)
         plt.xticks(
             ticks=pd.date_range(start=start_date, end=today, freq='7D'),
             labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
@@ -195,15 +171,15 @@ if username:
         plt.title("Meat Consumption Log")
         
         # Legend
-        import matplotlib.patches as mpatches
         legend_patches = [
             mpatches.Patch(color='green', label='Logged (meat eaten)'),
-            mpatches.Patch(color='lightgray', label='Not logged (unknown day)'),
+            mpatches.Patch(color='lightgray', label='Not logged (unknown day)')
         ]
         plt.legend(handles=legend_patches)
         plt.tight_layout()
         
         st.pyplot(plt)
+
         
 
 
