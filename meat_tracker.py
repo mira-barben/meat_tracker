@@ -113,14 +113,50 @@ if username:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
         # --- Plotting (Bar Chart) ---
-        plt.figure(figsize=(10, 6))
-        plt.bar(df_grouped.index, df_grouped.values, color='green')
-        plt.yticks(range(0, int(df_grouped.max()) + 1))
-        plt.xlabel("Time")
+        #plt.figure(figsize=(10, 6))
+        #plt.bar(df_grouped.index, df_grouped.values, color='green')
+        #plt.yticks(range(0, int(df_grouped.max()) + 1))
+        #plt.xlabel("Time")
+        #plt.ylabel("Number of Meat-Eating Events")
+        #plt.xticks(rotation=45)
+        #plt.tight_layout()
+        #st.pyplot(plt)
+
+        # --- Enrich df_grouped to track "logged" vs "auto-filled" zeros ---
+        df['logged'] = True
+        df_log_status = df.set_index('date')['logged']
+        df_combined = pd.DataFrame({
+            'count': df_grouped,
+            'logged': df_grouped.index.isin(df_log_status.index)
+        })
+        
+        # --- Plotting (Bar Chart with Missing Data Visualization) ---
+        plt.figure(figsize=(12, 6))
+        colors = ['green' if row.logged else 'lightgray' for row in df_combined.itertuples()]
+        bars = plt.bar(df_combined.index, df_combined['count'], color=colors)
+        
+        # Improve x-axis readability
+        plt.xticks(
+            ticks=pd.date_range(start=start_date, end=today, freq='7D'),
+            labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
+            rotation=45
+        )
+        
+        plt.xlabel("Date")
         plt.ylabel("Number of Meat-Eating Events")
-        plt.xticks(rotation=45)
+        plt.title("Meat Consumption Log")
         plt.tight_layout()
+        
+        # Add legend manually
+        import matplotlib.patches as mpatches
+        legend_patches = [
+            mpatches.Patch(color='green', label='Logged Days'),
+            mpatches.Patch(color='lightgray', label='No Entry')
+        ]
+        plt.legend(handles=legend_patches)
+        
         st.pyplot(plt)
+
 
         # --- Download Button ---
         df_download = df_grouped.reset_index()
