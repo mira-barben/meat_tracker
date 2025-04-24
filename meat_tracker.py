@@ -79,38 +79,29 @@ if username:
 
         df_grouped = df_grouped.reindex(all_dates, fill_value=0)
 
-        # --- New Approach for Current Streak (Days without meat) ---
-        streak = 0
-        current_streak = 0
-
-        # Find the last logged date with 0 count (no meat)
+        # --- "Days without meat" Calculation ---
+        days_without_meat = 0
         for date in reversed(df_grouped.index):
             if df_grouped.loc[date] == 0:
-                streak += 1  # Continue streak if count is 0 (no meat)
+                days_without_meat += 1  # Count consecutive days with no meat
             else:
-                current_streak = streak  # Update current streak when streak breaks
-                streak = 0  # Reset streak after non-zero count
+                break  # Stop counting as soon as we hit a day with meat
 
-        # If the loop ends with a streak of 0's, we need to update current_streak
-        current_streak = max(current_streak, streak)
-
-        # --- Longest streak (Days without meat) ---
+        # --- Longest Streak Calculation ---
         longest_streak = 0
         streak = 0
-
         for date in df_grouped.index:
             if df_grouped.loc[date] == 0:
-                streak += 1  # Count streak when no meat was eaten
+                streak += 1  # Increment streak if no meat on this day
             else:
                 longest_streak = max(longest_streak, streak)
-                streak = 0  # Reset streak after non-zero count
-
-        longest_streak = max(longest_streak, streak)
+                streak = 0  # Reset streak when meat is eaten
+        longest_streak = max(longest_streak, streak)  # In case the streak ends on the last day
 
         # --- Display Results ---
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("🥗 Days without meat", f"{current_streak} days")
+            st.metric("🥗 Days without meat", f"{days_without_meat} days")
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
@@ -168,3 +159,4 @@ if username:
         )
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
