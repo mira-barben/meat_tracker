@@ -83,7 +83,10 @@ if username:
         df_grouped = df_grouped.reindex(all_dates)
 
         # Set unlogged days (NaN) to 1 for grey bar representation
-        df_grouped.fillna(1, inplace=True)
+        df_grouped_filled = df_grouped.fillna(0)
+
+        # Now, update unlogged days (where count is 0) to 1 for grey bars
+        df_grouped_filled[df_grouped_filled == 0] = 1
 
         today = pd.Timestamp(datetime.today().date())
 
@@ -121,10 +124,10 @@ if username:
         fig, ax = plt.subplots(figsize=(10, 6))
 
         # Plot all days with grey bars (1 for unlogged)
-        ax.bar(df_grouped.index, df_grouped.values, color='grey', alpha=0.6, label="Unlogged (Default)")
+        ax.bar(df_grouped_filled.index, df_grouped_filled.values, color='grey', alpha=0.6, label="Unlogged (Default)")
 
         # Plotting the meat-eating events (green bars) on top of the grey bars
-        ax.bar(df_grouped.index[df_grouped > 1], df_grouped[df_grouped > 1], color='green', label="Logged Meat Events")
+        ax.bar(df_grouped.index[df_grouped > 0], df_grouped[df_grouped > 0], color='green', label="Logged Meat Events")
 
         ax.set_xlabel("Time")
         ax.set_ylabel("Meat-Eating Events", color='green')
