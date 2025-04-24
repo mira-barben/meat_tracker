@@ -113,9 +113,7 @@ if username:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
         # --- Identifying missing dates (unlogged) ---
-        missing_dates = df_grouped[df_grouped == 0].index
-        # We only want unlogged days where the date was skipped entirely (NaN or no entry at all)
-        unlogged_dates = [date for date in all_dates if date not in df_grouped.index]
+        missing_dates = set(all_dates) - set(df_grouped.index)
 
         # --- Plotting (Bar Chart) with two Y-Axes ---
         fig, ax1 = plt.subplots(figsize=(10, 6))
@@ -129,7 +127,7 @@ if username:
         # --- Second Y-Axis (for Unlogged Days) ---
         ax2 = ax1.twinx()  # Create a second y-axis sharing the same x-axis
         ax2.set_ylim(0, 1)  # The unlogged days will only have a value of 1 on the second axis
-        ax2.bar(unlogged_dates, [1] * len(unlogged_dates), color='gray', alpha=0.6)
+        ax2.bar(list(missing_dates), [1] * len(missing_dates), color='gray', alpha=0.6)
         ax2.set_ylabel("Unlogged Days", color='gray')
         ax2.tick_params(axis='y', labelcolor='gray')
 
