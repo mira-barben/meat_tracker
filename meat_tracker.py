@@ -80,18 +80,21 @@ if username:
         df_grouped = df_grouped.reindex(all_dates, fill_value=0)
 
         # --- Current streak ---
-        if df_grouped.index[-1] == today and df_grouped[today] > 0:
-            current_streak = 0
-        else:
-            streak = 0
-            for date in reversed(df_grouped.index):
-                if date > today:
-                    continue
-                if df_grouped[date] == 0:
-                    streak += 1
+        # Only count logged days where the user entered a 0 or more meat events
+        logged_dates = set(df['date'].dt.normalize())  # Days where events were logged
+        streak = 0
+        current_streak = 0
+
+        # Loop through the dates from the most recent backwards
+        for date in reversed(df_grouped.index):
+            if date > today:
+                continue
+            if date in logged_dates:  # Only count logged days (including 0)
+                if df_grouped.loc[date] == 0:
+                    streak += 1  # 0 is a conscious entry
                 else:
-                    break
-            current_streak = streak
+                    current_streak = streak
+                    streak = 0  # Reset the streak for a non-zero entry
 
         # --- Longest streak ---
         longest_streak = 0
@@ -116,7 +119,6 @@ if username:
 
         # This update includes zero values!
         df_all['actual_count'] = df.set_index('date')['count']
-        logged_dates = set(df['date'].dt.normalize())
         df_all['logged'] = df_all.index.isin(logged_dates)
 
         def compute_visual(row):
@@ -136,18 +138,18 @@ if username:
         plt.bar(df_all.index[mask], df_all.loc[mask, 'plot_count'], color=df_all.loc[mask, 'color'])
 
         plt.xticks(
-            ticks=pd.date_range(start=start_date, end=today, freq='7D'),
-            labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
-            rotation=45
+            ticks=pd.date_range(start=start_date, end=today, freq='1D'),
+            labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='1D')],
+            rotation=90
         )
 
         plt.xlabel("Date")
-        plt.ylabel("Meat-Eating Events (visualized)")
-        plt.title("Meat Consumption Log")
+        plt.ylabel("Meat-Eating Events")
+        plt.title("Meat Consumption Timeseries")
 
         legend_patches = [
             mpatches.Patch(color='green', label='Logged (meat eaten)'),
-            mpatches.Patch(color='lightgray', label='Not logged (unknown day)')
+            mpatches.Patch(color='lightgray', label='Not logged')
         ]
         plt.legend(handles=legend_patches)
         plt.tight_layout()
@@ -165,3 +167,4 @@ if username:
         )
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
