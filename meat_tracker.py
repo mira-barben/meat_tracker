@@ -121,8 +121,8 @@ if username:
         ax.bar(df_grouped.index[df_grouped > 0], df_grouped[df_grouped > 0], color='green', label="Logged Meat Events")
 
         ax.set_xlabel("Time")
-        ax.set_ylabel("Meat-Eating Events", color='green')
-        ax.tick_params(axis='y', labelcolor='green')
+        ax.set_ylabel("Meat-Eating Events")
+        ax.tick_params(axis='y')
 
         # Rotate the x-axis labels for better readability
         plt.xticks(rotation=45)
