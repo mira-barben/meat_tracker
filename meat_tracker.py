@@ -108,27 +108,33 @@ if username:
         # --- Visualization ---
         df_all = pd.DataFrame(index=all_dates)
         df_all.index.name = 'date'
-        df_all['actual_count'] = 0
+        df_all['actual_count'] = 0  # Default all days to 0
 
+        # Fill actual_count with logged data
         df_all['actual_count'] = df.set_index('date')['count']
-        df_all['logged'] = df_all.index.isin(df['date'])
+        df_all['logged'] = df_all.index.isin(df['date'])  # Mark which days are logged
 
+        # This function will determine what to display for each day
         def compute_visual(row):
             if row['logged']:
                 if row['actual_count'] == 0:
-                    return pd.NA, 'none'  # Hide bar if no meat on logged day
+                    return pd.NA, 'none'  # No bar for zero meat days
                 else:
-                    return row['actual_count'], 'green'  # Normal color for logged meat
+                    return row['actual_count'], 'green'  # Green bar for days with meat
             else:
-                return 1, 'lightgray'  # Lightgray color for unlogged days
+                return 1, 'lightgray'  # Grey bar for unlogged days (value of 1 for visualization)
 
+        # Apply to get the correct plot_count and colors
         df_all[['plot_count', 'color']] = df_all.apply(compute_visual, axis=1, result_type='expand')
 
         import matplotlib.patches as mpatches
         plt.figure(figsize=(12, 6))
+        
+        # Only plot days with actual counts
         mask = df_all['color'] != 'none'
         plt.bar(df_all.index[mask], df_all.loc[mask, 'plot_count'], color=df_all.loc[mask, 'color'])
 
+        # Set up x-ticks
         plt.xticks(
             ticks=pd.date_range(start=start_date, end=today, freq='7D'),
             labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
@@ -139,6 +145,7 @@ if username:
         plt.ylabel("Meat-Eating Events")
         plt.title("Meat Consumption Timeseries")
 
+        # Legend for visual clarity
         legend_patches = [
             mpatches.Patch(color='green', label='Logged (meat eaten)'),
             mpatches.Patch(color='lightgray', label='Not logged (missing entry)')
