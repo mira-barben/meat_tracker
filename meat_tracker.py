@@ -109,13 +109,13 @@ if username:
         df_all = pd.DataFrame(index=all_dates)
         df_all.index.name = 'date'
         df_all['actual_count'] = 0  # Default all days to 0 for counting
-
+        
         # Fill actual_count with logged data
         df_all['actual_count'] = df.set_index('date')['count']
         
         # Mark which days are logged (i.e. data is available)
         df_all['logged'] = df_all.index.isin(df['date'])
-
+        
         # Create the visualization
         def compute_visual(row):
             if row['logged']:
@@ -125,28 +125,31 @@ if username:
                     return row['actual_count'], 'green'  # Green bar for days with meat
             else:
                 return pd.NA, 'lightgray'  # Grey bar for unlogged days (No data, just visual)
-
+        
         # Apply this function to determine plot counts and colors
         df_all[['plot_count', 'color']] = df_all.apply(compute_visual, axis=1, result_type='expand')
-
+        
         import matplotlib.patches as mpatches
         plt.figure(figsize=(12, 6))
-
-        # Filter to exclude NaN (unlogged days)
-        mask = df_all['color'] != 'none'
+        
+        # --- Fixing the issue: Filter out NaN values from plot data ---
+        # Only keep rows where 'plot_count' is not NaN
+        mask = df_all['plot_count'].notna()
+        
+        # Plot only valid rows
         plt.bar(df_all.index[mask], df_all.loc[mask, 'plot_count'], color=df_all.loc[mask, 'color'])
-
+        
         # Setup x-ticks
         plt.xticks(
             ticks=pd.date_range(start=start_date, end=today, freq='7D'),
             labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
             rotation=45
         )
-
+        
         plt.xlabel("Date")
         plt.ylabel("Meat-Eating Events")
         plt.title("Meat Consumption Timeseries")
-
+        
         # Add a legend for the bars
         legend_patches = [
             mpatches.Patch(color='green', label='Logged (meat eaten)'),
@@ -155,6 +158,7 @@ if username:
         plt.legend(handles=legend_patches)
         plt.tight_layout()
         st.pyplot(plt)
+
 
         # --- Download Button ---
         df_download = df_grouped.reset_index()
