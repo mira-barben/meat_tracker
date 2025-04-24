@@ -79,8 +79,7 @@ if username:
 
         df_grouped = df_grouped.reindex(all_dates, fill_value=0)
 
-        # --- Current streak ---
-        # Only count logged days where the user entered a 0 or more meat events
+        # --- Current streak --- (Fix for counting logged days only)
         logged_dates = set(df['date'].dt.normalize())  # Days where events were logged
         streak = 0
         current_streak = 0
