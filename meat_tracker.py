@@ -96,7 +96,7 @@ if username:
                     current_streak = streak
                     streak = 0  # Reset the streak for a non-zero entry
 
-        # --- Longest streak --- (Modified to ignore unlogged days)
+       # --- Longest streak --- (Modified to ignore unlogged days)
         longest_streak = 0
         streak = 0
         for date in df_grouped.index:
@@ -107,7 +107,7 @@ if username:
                     longest_streak = max(longest_streak, streak)
                     streak = 0
         longest_streak = max(longest_streak, streak)  # In case the streak ends on the last day
-
+        
         col1, col2 = st.columns(2)
         with col1:
             st.metric("🥗 Days without meat", f"{current_streak} days")
