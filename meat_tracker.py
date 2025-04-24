@@ -68,6 +68,10 @@ if username:
         if meat_events > 0:
             new_row = pd.DataFrame({'date': [selected_date], 'count': [meat_events]})
             df = pd.concat([df, new_row], ignore_index=True)
+        else:
+            # If 0 is logged, just ensure it's logged as 0
+            new_row = pd.DataFrame({'date': [selected_date], 'count': [0]})
+            df = pd.concat([df, new_row], ignore_index=True)
         save_data(df, username, existing_file)
         st.sidebar.success(f"Saved {meat_events} event(s) for {selected_date.date()}!")
         st.rerun()
