@@ -116,11 +116,11 @@ if username:
         def compute_visual(row):
             if row['logged']:
                 if row['actual_count'] == 0:
-                    return pd.NA, 'none'  # hide bar if no meat
+                    return pd.NA, 'none'  # Hide bar if no meat on logged day
                 else:
-                    return row['actual_count'], 'green'
+                    return row['actual_count'], 'green'  # Normal color for logged meat
             else:
-                return 1, 'lightgray'
+                return 1, 'lightgray'  # Lightgray color for unlogged days
 
         df_all[['plot_count', 'color']] = df_all.apply(compute_visual, axis=1, result_type='expand')
 
@@ -141,7 +141,7 @@ if username:
 
         legend_patches = [
             mpatches.Patch(color='green', label='Logged (meat eaten)'),
-            mpatches.Patch(color='lightgray', label='Not logged')
+            mpatches.Patch(color='lightgray', label='Not logged (missing entry)')
         ]
         plt.legend(handles=legend_patches)
         plt.tight_layout()
@@ -159,4 +159,3 @@ if username:
         )
 else:
     st.warning("Please enter your username in the sidebar to continue.")
-
