@@ -118,10 +118,10 @@ if username:
         fig, ax = plt.subplots(figsize=(10, 6))
 
         # Plot all days with grey bars (1 for unlogged)
-        ax.bar(df_grouped.index, df_grouped.values, color='grey', alpha=0.6)
+        ax.bar(df_grouped.index, df_grouped.values, color='grey', alpha=0.6, label="Unlogged (Default)")
 
         # Plotting the meat-eating events (green bars) on top of the grey bars
-        ax.bar(df_grouped.index[df_grouped > 1], df_grouped[df_grouped > 1], color='green')
+        ax.bar(df_grouped.index[df_grouped > 1], df_grouped[df_grouped > 1], color='green', label="Logged Meat Events")
 
         ax.set_xlabel("Time")
         ax.set_ylabel("Meat-Eating Events", color='green')
