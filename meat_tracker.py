@@ -108,33 +108,35 @@ if username:
         # --- Visualization ---
         df_all = pd.DataFrame(index=all_dates)
         df_all.index.name = 'date'
-        df_all['actual_count'] = 0  # Default all days to 0
+        df_all['actual_count'] = 0  # Default all days to 0 for counting
 
         # Fill actual_count with logged data
         df_all['actual_count'] = df.set_index('date')['count']
-        df_all['logged'] = df_all.index.isin(df['date'])  # Mark which days are logged
+        
+        # Mark which days are logged (i.e. data is available)
+        df_all['logged'] = df_all.index.isin(df['date'])
 
-        # This function will determine what to display for each day
+        # Create the visualization
         def compute_visual(row):
             if row['logged']:
                 if row['actual_count'] == 0:
-                    return pd.NA, 'none'  # No bar for zero meat days
+                    return pd.NA, 'none'  # No bar for zero meat days (logged as 0)
                 else:
                     return row['actual_count'], 'green'  # Green bar for days with meat
             else:
-                return 1, 'lightgray'  # Grey bar for unlogged days (value of 1 for visualization)
+                return pd.NA, 'lightgray'  # Grey bar for unlogged days (No data, just visual)
 
-        # Apply to get the correct plot_count and colors
+        # Apply this function to determine plot counts and colors
         df_all[['plot_count', 'color']] = df_all.apply(compute_visual, axis=1, result_type='expand')
 
         import matplotlib.patches as mpatches
         plt.figure(figsize=(12, 6))
-        
-        # Only plot days with actual counts
+
+        # Filter to exclude NaN (unlogged days)
         mask = df_all['color'] != 'none'
         plt.bar(df_all.index[mask], df_all.loc[mask, 'plot_count'], color=df_all.loc[mask, 'color'])
 
-        # Set up x-ticks
+        # Setup x-ticks
         plt.xticks(
             ticks=pd.date_range(start=start_date, end=today, freq='7D'),
             labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
@@ -145,7 +147,7 @@ if username:
         plt.ylabel("Meat-Eating Events")
         plt.title("Meat Consumption Timeseries")
 
-        # Legend for visual clarity
+        # Add a legend for the bars
         legend_patches = [
             mpatches.Patch(color='green', label='Logged (meat eaten)'),
             mpatches.Patch(color='lightgray', label='Not logged (missing entry)')
@@ -166,3 +168,4 @@ if username:
         )
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
