@@ -84,13 +84,19 @@ if username:
         streak = 0
         current_streak = 0
 
+        # --- Current streak ---
+        # Only count logged days where the user entered a 0 or more meat events
+        logged_dates = set(df['date'].dt.normalize())  # Days where events were logged
+        streak = 0
+        current_streak = 0
+
         # Loop through the dates from the most recent backwards
         for date in reversed(df_grouped.index):
             if date > today:
                 continue
             if date in logged_dates:  # Only count logged days (including 0)
                 if df_grouped.loc[date] == 0:
-                    streak += 1  # 0 is a conscious entry (no meat)
+                    streak += 1  # 0 is a conscious entry
                 else:
                     current_streak = streak
                     streak = 0  # Reset the streak for a non-zero entry
