@@ -32,6 +32,7 @@ def load_data(username):
 
         df['date'] = pd.to_datetime(df['date']).dt.normalize()
 
+        # Upgrade old data format
         if 'count' not in df.columns:
             df['count'] = 1
 
@@ -57,14 +58,16 @@ st.sidebar.header("Tracker Settings")
 if username:
     df, existing_file = load_data(username)
 
+    # Sidebar input for logging
     selected_date = st.sidebar.date_input("Select the date")
     meat_events = st.sidebar.number_input("How many meat-eating events on this day?", min_value=0, step=1)
 
     if st.sidebar.button("Save"):
         selected_date = pd.to_datetime(selected_date).normalize()
         df = df[df['date'] != selected_date]  # Remove previous entry for this date
-        new_row = pd.DataFrame({'date': [selected_date], 'count': [meat_events]})
-        df = pd.concat([df, new_row], ignore_index=True)
+        if meat_events > 0:
+            new_row = pd.DataFrame({'date': [selected_date], 'count': [meat_events]})
+            df = pd.concat([df, new_row], ignore_index=True)
         save_data(df, username, existing_file)
         st.sidebar.success(f"Saved {meat_events} event(s) for {selected_date.date()}!")
         st.rerun()
@@ -72,56 +75,69 @@ if username:
     if not df.empty:
         df['date'] = pd.to_datetime(df['date']).dt.normalize()
         df_grouped = df.groupby('date')['count'].sum()
-
+        
         start_date = pd.to_datetime('2025-02-10')
-        today = pd.Timestamp(datetime.today().date())
-        all_dates = pd.date_range(start=start_date, end=today, freq='D')
-
+        all_dates = pd.date_range(start=start_date, end=datetime.today(), freq='D')
         df_grouped = df_grouped.reindex(all_dates, fill_value=0)
 
-        # --- Unlogged Days Calculation ---
-        logged_dates = set(df['date'].dt.normalize())  # Set of dates where entries were made
-        unlogged_dates = [date for date in df_grouped.index if date not in logged_dates]
+        today = pd.Timestamp(datetime.today().date())
 
-        # --- Display Results ---
+        # --- Current streak ---
+        if df_grouped.index[-1] == today and df_grouped[today] > 0:
+            current_streak = 0
+        else:
+            streak = 0
+            for date in reversed(df_grouped.index):
+                if date > today:
+                    continue
+                if df_grouped[date] == 0:
+                    streak += 1
+                else:
+                    break
+            current_streak = streak
+
+        # --- Longest streak ---
+        longest_streak = 0
+        streak = 0
+        for val in df_grouped.values:
+            if val == 0:
+                streak += 1
+                longest_streak = max(longest_streak, streak)
+            else:
+                streak = 0
+
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("🥗 Days without meat", f"{df_grouped[df_grouped == 0].count()} days")
+            st.metric("🥗 Days without meat", f"{current_streak} days")
         with col2:
-            st.metric("🏆 Longest streak", f"X days (Modify this part if needed)")
+            st.metric("🏆 Longest streak", f"{longest_streak} days")
 
-        # --- Visualization ---
-        plt.figure(figsize=(12, 6))
+        # --- Plotting (Bar Chart) ---
+        plt.figure(figsize=(10, 6))
         plt.bar(df_grouped.index, df_grouped.values, color='green')
-
-        # Setup x-ticks
-        plt.xticks(
-            ticks=pd.date_range(start=start_date, end=today, freq='7D'),
-            labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
-            rotation=45
-        )
-
-        plt.xlabel("Date")
-        plt.ylabel("Meat-Eating Events")
-        plt.title("Meat Consumption Timeseries")
+        plt.yticks(range(0, int(df_grouped.max()) + 1))
+        plt.xlabel("Time")
+        plt.ylabel("Number of Meat-Eating Events")
+        plt.xticks(rotation=45)
         plt.tight_layout()
         st.pyplot(plt)
-
-        # --- Display Unlogged Days Table ---
-        if unlogged_dates:
-            st.subheader("Unlogged Days")
-            unlogged_df = pd.DataFrame(unlogged_dates, columns=['Unlogged Dates'])
-            st.write(unlogged_df)
 
         # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
-        df_download['date'] = df_download['date'].dt.strftime('%Y-%d-%m')
+        df_download['date'] = df_download['date'].dt.strftime('%Y-%d-%m')  # European format
         st.download_button(
             label="📥 Download your data as CSV",
             data=df_download.to_csv(index=False).encode('utf-8'),
             file_name=f"{username}_meat_tracker_log.csv",
             mime='text/csv'
         )
+
+    # --- Reset button ---
+    #if st.sidebar.button("Reset Data"):
+    #    df = pd.DataFrame(columns=['date', 'count'])
+    #    save_data(df, username, existing_file)
+    #    st.sidebar.success("Your data has been reset!")
+    #    st.rerun()
 else:
     st.warning("Please enter your username in the sidebar to continue.")
