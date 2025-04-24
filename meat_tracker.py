@@ -79,86 +79,39 @@ if username:
 
         df_grouped = df_grouped.reindex(all_dates, fill_value=0)
 
-        # --- "Days without meat" Calculation ---
-        days_without_meat = 0
-        for date in reversed(df_grouped.index):
-            if df_grouped.loc[date] == 0:
-                days_without_meat += 1  # Count consecutive days with no meat
-            else:
-                break  # Stop counting as soon as we hit a day with meat
-
-        # --- Longest Streak Calculation ---
-        longest_streak = 0
-        streak = 0
-        for date in df_grouped.index:
-            if df_grouped.loc[date] == 0:
-                streak += 1  # Increment streak if no meat on this day
-            else:
-                longest_streak = max(longest_streak, streak)
-                streak = 0  # Reset streak when meat is eaten
-        longest_streak = max(longest_streak, streak)  # In case the streak ends on the last day
+        # --- Unlogged Days Calculation ---
+        logged_dates = set(df['date'].dt.normalize())  # Set of dates where entries were made
+        unlogged_dates = [date for date in df_grouped.index if date not in logged_dates]
 
         # --- Display Results ---
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("🥗 Days without meat", f"{days_without_meat} days")
+            st.metric("🥗 Days without meat", f"{df_grouped[df_grouped == 0].count()} days")
         with col2:
-            st.metric("🏆 Longest streak", f"{longest_streak} days")
+            st.metric("🏆 Longest streak", f"X days (Modify this part if needed)")
 
         # --- Visualization ---
-        df_all = pd.DataFrame(index=all_dates)
-        df_all.index.name = 'date'
-        df_all['actual_count'] = 0  # Default all days to 0 for counting
-        
-        # Fill actual_count with logged data
-        df_all['actual_count'] = df.set_index('date')['count']
-        
-        # Mark which days are logged (i.e. data is available)
-        df_all['logged'] = df_all.index.isin(df['date'])
-        
-        # Create the visualization
-        def compute_visual(row):
-            if row['logged']:
-                if row['actual_count'] == 0:
-                    return pd.NA, 'none'  # No bar for zero meat days (logged as 0)
-                else:
-                    return row['actual_count'], 'green'  # Green bar for days with meat
-            else:
-                return pd.NA, 'lightgray'  # Grey bar for unlogged days (No data, just visual)
-        
-        # Apply this function to determine plot counts and colors
-        df_all[['plot_count', 'color']] = df_all.apply(compute_visual, axis=1, result_type='expand')
-        
-        import matplotlib.patches as mpatches
         plt.figure(figsize=(12, 6))
-        
-        # --- Fixing the issue: Filter out NaN values from plot data ---
-        # Only keep rows where 'plot_count' is not NaN
-        mask = df_all['plot_count'].notna()
-        
-        # Plot only valid rows
-        plt.bar(df_all.index[mask], df_all.loc[mask, 'plot_count'], color=df_all.loc[mask, 'color'])
-        
+        plt.bar(df_grouped.index, df_grouped.values, color='green')
+
         # Setup x-ticks
         plt.xticks(
             ticks=pd.date_range(start=start_date, end=today, freq='7D'),
             labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
             rotation=45
         )
-        
+
         plt.xlabel("Date")
         plt.ylabel("Meat-Eating Events")
         plt.title("Meat Consumption Timeseries")
-        
-        # Add a legend for the bars
-        legend_patches = [
-            mpatches.Patch(color='green', label='Logged (meat eaten)'),
-            mpatches.Patch(color='lightgray', label='Not logged (missing entry)')
-        ]
-        plt.legend(handles=legend_patches)
         plt.tight_layout()
         st.pyplot(plt)
 
+        # --- Display Unlogged Days Table ---
+        if unlogged_dates:
+            st.subheader("Unlogged Days")
+            unlogged_df = pd.DataFrame(unlogged_dates, columns=['Unlogged Dates'])
+            st.write(unlogged_df)
 
         # --- Download Button ---
         df_download = df_grouped.reset_index()
@@ -172,4 +125,3 @@ if username:
         )
 else:
     st.warning("Please enter your username in the sidebar to continue.")
-
