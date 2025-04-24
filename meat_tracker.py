@@ -138,9 +138,9 @@ if username:
         plt.bar(df_all.index[mask], df_all.loc[mask, 'plot_count'], color=df_all.loc[mask, 'color'])
 
         plt.xticks(
-            ticks=pd.date_range(start=start_date, end=today, freq='1D'),
-            labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='1D')],
-            rotation=90
+            ticks=pd.date_range(start=start_date, end=today, freq='7D'),
+            labels=[d.strftime('%d.%m') for d in pd.date_range(start=start_date, end=today, freq='7D')],
+            rotation=45
         )
 
         plt.xlabel("Date")
