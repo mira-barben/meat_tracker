@@ -122,6 +122,16 @@ if username:
         plt.tight_layout()
         st.pyplot(plt)
 
+        # --- Unlogged Days Calculation ---
+        logged_dates = set(df['date'].dt.normalize())  # Set of dates where entries were made
+        unlogged_dates = [date for date in df_grouped.index if date not in logged_dates]
+
+        # --- Display Unlogged Days Table ---
+        if unlogged_dates:
+            st.subheader("Unlogged Days")
+            unlogged_df = pd.DataFrame(unlogged_dates, columns=['Unlogged Dates'])
+            st.write(unlogged_df)
+
         # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
