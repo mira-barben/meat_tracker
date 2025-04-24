@@ -90,6 +90,11 @@ if username:
         streak = 0
         current_streak = 0
 
+        # --- Current streak --- (Fix for counting logged days with 0)
+        logged_dates = set(df['date'].dt.normalize())  # Days where events were logged
+        streak = 0
+        current_streak = 0
+        
         # Loop through the dates from the most recent backwards
         for date in reversed(df_grouped.index):
             if date > today:
@@ -100,7 +105,10 @@ if username:
                 else:
                     current_streak = streak
                     streak = 0  # Reset the streak for a non-zero entry
-
+        
+        # If the loop ends with a streak of 0's, we need to update current_streak
+        current_streak = max(current_streak, streak)
+        
         # --- Longest streak --- (Modified to ignore unlogged days)
         longest_streak = 0
         streak = 0
@@ -113,11 +121,13 @@ if username:
                     streak = 0
         longest_streak = max(longest_streak, streak)  # In case the streak ends on the last day
         
+        # Display results
         col1, col2 = st.columns(2)
         with col1:
             st.metric("🥗 Days without meat", f"{current_streak} days")
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
+
 
         # --- Improved Visualization ---
         df_all = pd.DataFrame(index=all_dates)
