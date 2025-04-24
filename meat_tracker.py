@@ -65,13 +65,16 @@ if username:
     if st.sidebar.button("Save"):
         selected_date = pd.to_datetime(selected_date).normalize()
         df = df[df['date'] != selected_date]  # Remove previous entry for this date
+
+        # Add new entry for the selected date
         if meat_events > 0:
             new_row = pd.DataFrame({'date': [selected_date], 'count': [meat_events]})
             df = pd.concat([df, new_row], ignore_index=True)
-        else:
-            # If 0 is logged, just ensure it's logged as 0
+        elif meat_events == 0:
+            # Explicitly log a 0 for no meat-eating events, so it will appear as 0 in the chart
             new_row = pd.DataFrame({'date': [selected_date], 'count': [0]})
             df = pd.concat([df, new_row], ignore_index=True)
+        
         save_data(df, username, existing_file)
         st.sidebar.success(f"Saved {meat_events} event(s) for {selected_date.date()}!")
         st.rerun()
@@ -79,34 +82,18 @@ if username:
     if not df.empty:
         df['date'] = pd.to_datetime(df['date']).dt.normalize()
         df_grouped = df.groupby('date')['count'].sum()
-        
+
         start_date = pd.to_datetime('2025-02-10')
         all_dates = pd.date_range(start=start_date, end=datetime.today(), freq='D')
-        
+
         # Reindex to fill missing days with NaN (unlogged days)
         df_grouped = df_grouped.reindex(all_dates)
 
         # Set unlogged days (NaN) to 1 for grey bar representation
-        df_grouped_filled = df_grouped.fillna(0)
-
-        # Now, update unlogged days (where count is 0) to 1 for grey bars
-        df_grouped_filled[df_grouped_filled == 0] = 1
-
-        today = pd.Timestamp(datetime.today().date())
+        df_grouped_filled = df_grouped.fillna(1)
 
         # --- Current streak ---
-        if df_grouped.index[-1] == today and df_grouped[today] > 0:
-            current_streak = 0
-        else:
-            streak = 0
-            for date in reversed(df_grouped.index):
-                if date > today:
-                    continue
-                if df_grouped[date] == 0:
-                    streak += 1
-                else:
-                    break
-            current_streak = streak
+        today = pd.Timestamp(datetime.today().date())
 
         # --- Longest streak ---
         longest_streak = 0
@@ -120,7 +107,7 @@ if username:
 
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("🥗 Days without meat", f"{current_streak} days")
+            st.metric("🥗 Days without meat", f"{streak} days")
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
@@ -153,11 +140,5 @@ if username:
             mime='text/csv'
         )
 
-    # --- Reset button ---
-    #if st.sidebar.button("Reset Data"):
-    #    df = pd.DataFrame(columns=['date', 'count'])
-    #    save_data(df, username, existing_file)
-    #    st.sidebar.success("Your data has been reset!")
-    #    st.rerun()
 else:
     st.warning("Please enter your username in the sidebar to continue.")
