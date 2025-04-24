@@ -112,25 +112,25 @@ if username:
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
-        # --- Plotting (Bar Chart) ---
-        plt.figure(figsize=(10, 6))
-        plt.bar(df_grouped.index, df_grouped.values, color='green')
-        plt.yticks(range(0, int(df_grouped.max()) + 1))
-        plt.xlabel("Time")
-        plt.ylabel("Number of Meat-Eating Events")
+        # --- Plotting (Bar Chart) with two Y-Axes ---
+        fig, ax1 = plt.subplots(figsize=(10, 6))
+
+        # Plotting the meat-eating events (green bars) on the left Y-axis
+        ax1.bar(df_grouped.index, df_grouped.values, color='green')
+        ax1.set_xlabel("Time")
+        ax1.set_ylabel("Meat-Eating Events", color='green')
+        ax1.tick_params(axis='y', labelcolor='green')
+
+        # --- Second Y-Axis (for Unlogged Days) ---
+        ax2 = ax1.twinx()  # Create a second y-axis sharing the same x-axis
+        ax2.set_ylim(0, 1)  # The unlogged days will only have a value of 1 on the second axis
+        ax2.bar(df_grouped.index[df_grouped.values == 0], [1] * len(df_grouped[df_grouped.values == 0]), color='gray', alpha=0.6)
+        ax2.set_ylabel("Unlogged Days", color='gray')
+        ax2.tick_params(axis='y', labelcolor='gray')
+
         plt.xticks(rotation=45)
         plt.tight_layout()
-        st.pyplot(plt)
-
-        # --- Unlogged Days Calculation ---
-        logged_dates = set(df['date'].dt.normalize())  # Set of dates where entries were made
-        unlogged_dates = [date for date in df_grouped.index if date not in logged_dates]
-
-        # --- Display Unlogged Days Table ---
-        if unlogged_dates:
-            st.subheader("Unlogged Days")
-            unlogged_df = pd.DataFrame(unlogged_dates, columns=['Unlogged Dates'])
-            st.write(unlogged_df)
+        st.pyplot(fig)
 
         # --- Download Button ---
         df_download = df_grouped.reset_index()
