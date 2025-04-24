@@ -96,15 +96,17 @@ if username:
                     current_streak = streak
                     streak = 0  # Reset the streak for a non-zero entry
 
-        # --- Longest streak ---
+        # --- Longest streak --- (Modified to ignore unlogged days)
         longest_streak = 0
         streak = 0
-        for val in df_grouped.values:
-            if val == 0:
-                streak += 1
-                longest_streak = max(longest_streak, streak)
-            else:
-                streak = 0
+        for date in df_grouped.index:
+            if date in logged_dates:  # Only count logged days
+                if df_grouped.loc[date] == 0:
+                    streak += 1  # 0 is a conscious entry
+                else:
+                    longest_streak = max(longest_streak, streak)
+                    streak = 0
+        longest_streak = max(longest_streak, streak)  # In case the streak ends on the last day
 
         col1, col2 = st.columns(2)
         with col1:
