@@ -79,57 +79,53 @@ if username:
 
         df_grouped = df_grouped.reindex(all_dates, fill_value=0)
 
-        # --- Current streak --- (Fix for counting logged days with 0)
-        logged_dates = set(df['date'].dt.normalize())  # Days where events were logged
+        # --- New Approach for Current Streak (Days without meat) ---
         streak = 0
         current_streak = 0
 
-        # Loop through the dates from the most recent backwards
+        # Find the last logged date with 0 count (no meat)
         for date in reversed(df_grouped.index):
-            if date > today:
-                continue
-            if date in logged_dates:  # Only count logged days (including 0)
-                if df_grouped.loc[date] == 0:
-                    streak += 1  # 0 is a conscious entry (no meat)
-                else:
-                    current_streak = streak
-                    streak = 0  # Reset the streak for a non-zero entry
+            if df_grouped.loc[date] == 0:
+                streak += 1  # Continue streak if count is 0 (no meat)
+            else:
+                current_streak = streak  # Update current streak when streak breaks
+                streak = 0  # Reset streak after non-zero count
 
         # If the loop ends with a streak of 0's, we need to update current_streak
         current_streak = max(current_streak, streak)
 
-        # --- Longest streak --- (Modified to ignore unlogged days)
+        # --- Longest streak (Days without meat) ---
         longest_streak = 0
         streak = 0
+
         for date in df_grouped.index:
-            if date in logged_dates:  # Only count logged days
-                if df_grouped.loc[date] == 0:
-                    streak += 1  # 0 is a conscious entry (no meat)
-                else:
-                    longest_streak = max(longest_streak, streak)
-                    streak = 0
-        longest_streak = max(longest_streak, streak)  # In case the streak ends on the last day
-        
-        # Display results
+            if df_grouped.loc[date] == 0:
+                streak += 1  # Count streak when no meat was eaten
+            else:
+                longest_streak = max(longest_streak, streak)
+                streak = 0  # Reset streak after non-zero count
+
+        longest_streak = max(longest_streak, streak)
+
+        # --- Display Results ---
         col1, col2 = st.columns(2)
         with col1:
             st.metric("🥗 Days without meat", f"{current_streak} days")
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
-        # --- Improved Visualization ---
+        # --- Visualization ---
         df_all = pd.DataFrame(index=all_dates)
         df_all.index.name = 'date'
         df_all['actual_count'] = 0
 
-        # This update includes zero values!
         df_all['actual_count'] = df.set_index('date')['count']
-        df_all['logged'] = df_all.index.isin(logged_dates)
+        df_all['logged'] = df_all.index.isin(df['date'])
 
         def compute_visual(row):
             if row['logged']:
                 if row['actual_count'] == 0:
-                    return pd.NA, 'none'  # hide bar
+                    return pd.NA, 'none'  # hide bar if no meat
                 else:
                     return row['actual_count'], 'green'
             else:
