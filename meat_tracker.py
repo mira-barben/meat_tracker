@@ -79,8 +79,11 @@ if username:
         start_date = pd.to_datetime('2025-02-10')
         all_dates = pd.date_range(start=start_date, end=datetime.today(), freq='D')
         
-        # Reindex to fill missing days with 1 (grey bars for unlogged days)
-        df_grouped = df_grouped.reindex(all_dates, fill_value=1)  # Default is 1 (grey bar)
+        # Reindex to fill missing days with NaN (unlogged days)
+        df_grouped = df_grouped.reindex(all_dates)
+
+        # Set unlogged days (NaN) to 1 for grey bar representation
+        df_grouped.fillna(1, inplace=True)
 
         today = pd.Timestamp(datetime.today().date())
 
