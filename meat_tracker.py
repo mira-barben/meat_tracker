@@ -90,11 +90,11 @@ if username:
                 continue
             if date in logged_dates:  # Only count logged days (including 0)
                 if df_grouped.loc[date] == 0:
-                    streak += 1  # 0 is a conscious entry
+                    streak += 1  # 0 is a conscious entry (no meat)
                 else:
                     current_streak = streak
                     streak = 0  # Reset the streak for a non-zero entry
-        
+
         # If the loop ends with a streak of 0's, we need to update current_streak
         current_streak = max(current_streak, streak)
 
@@ -104,7 +104,7 @@ if username:
         for date in df_grouped.index:
             if date in logged_dates:  # Only count logged days
                 if df_grouped.loc[date] == 0:
-                    streak += 1  # 0 is a conscious entry
+                    streak += 1  # 0 is a conscious entry (no meat)
                 else:
                     longest_streak = max(longest_streak, streak)
                     streak = 0
