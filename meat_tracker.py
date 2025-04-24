@@ -78,7 +78,9 @@ if username:
         
         start_date = pd.to_datetime('2025-02-10')
         all_dates = pd.date_range(start=start_date, end=datetime.today(), freq='D')
-        df_grouped = df_grouped.reindex(all_dates, fill_value=0)
+        
+        # Reindex to fill missing days with 1 (grey bars for unlogged days)
+        df_grouped = df_grouped.reindex(all_dates, fill_value=1)  # Default is 1 (grey bar)
 
         today = pd.Timestamp(datetime.today().date())
 
@@ -112,25 +114,20 @@ if username:
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
-        # --- Identifying missing dates (unlogged) ---
-        missing_dates = set(all_dates) - set(df_grouped.index)
+        # --- Plotting (Bar Chart) --- 
+        fig, ax = plt.subplots(figsize=(10, 6))
 
-        # --- Plotting (Bar Chart) with two Y-Axes ---
-        fig, ax1 = plt.subplots(figsize=(10, 6))
+        # Plot all days with grey bars (1 for unlogged)
+        ax.bar(df_grouped.index, df_grouped.values, color='grey', alpha=0.6)
 
-        # Plotting the meat-eating events (green bars) on the left Y-axis
-        ax1.bar(df_grouped.index, df_grouped.values, color='green')
-        ax1.set_xlabel("Time")
-        ax1.set_ylabel("Meat-Eating Events", color='green')
-        ax1.tick_params(axis='y', labelcolor='green')
+        # Plotting the meat-eating events (green bars) on top of the grey bars
+        ax.bar(df_grouped.index[df_grouped > 1], df_grouped[df_grouped > 1], color='green')
 
-        # --- Second Y-Axis (for Unlogged Days) ---
-        ax2 = ax1.twinx()  # Create a second y-axis sharing the same x-axis
-        ax2.set_ylim(0, 1)  # The unlogged days will only have a value of 1 on the second axis
-        ax2.bar(list(missing_dates), [1] * len(missing_dates), color='gray', alpha=0.6)
-        ax2.set_ylabel("Unlogged Days", color='gray')
-        ax2.tick_params(axis='y', labelcolor='gray')
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Meat-Eating Events", color='green')
+        ax.tick_params(axis='y', labelcolor='green')
 
+        # Rotate the x-axis labels for better readability
         plt.xticks(rotation=45)
         plt.tight_layout()
         st.pyplot(fig)
