@@ -111,6 +111,46 @@ if username:
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
+
+        # --- Achievements: Full Meat-Free Weeks ---
+        full_weeks = 0
+        df_zero_filled = df_grouped.fillna(999)  # Use 999 to clearly distinguish unlogged days
+
+        for i in range(len(df_zero_filled) - 6):
+            week = df_zero_filled.iloc[i:i+7]
+            week_dates = week.index
+
+            # Check if it starts on a Monday and ends on a Sunday
+            if week_dates[0].weekday() == 0 and week_dates[-1].weekday() == 6:
+                if all(week == 0):
+                    full_weeks += 1
+
+        if full_weeks > 0:
+            st.success(f"🌟 Meat-Free Week Unlocked! You've had {full_weeks} full week{'s' if full_weeks > 1 else ''} without meat!")
+
+                # --- Achievements: Streak Milestones ---
+        if current_streak >= 30:
+            st.success("🔥 30-Day Streak! Legendary!")
+        elif current_streak >= 20:
+            st.info("🏅 20-Day Streak! You're on fire!")
+
+        # --- Achievements: Full Meat-Free Weeks ---
+        full_weeks = 0
+        df_zero_filled = df_grouped.fillna(999)  # Use 999 to catch unlogged days
+
+        for i in range(len(df_zero_filled) - 6):
+            week = df_zero_filled.iloc[i:i+7]
+            week_dates = week.index
+
+            # Check if it's a Monday-Sunday stretch and all days == 0
+            if week_dates[0].weekday() == 0 and week_dates[-1].weekday() == 6:
+                if all(week == 0):
+                    full_weeks += 1
+
+        if full_weeks > 0:
+            st.success(f"🌿 You’ve completed {full_weeks} full meat-free week{'s' if full_weeks > 1 else ''}!")
+
+
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
 
