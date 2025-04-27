@@ -112,12 +112,15 @@ if username:
 
         # --- Achievements ---
         # Streak milestones
+        if streak >= 10:
+            st.info("🎉 10-Day Streak! Congrats!")
+        
+        if streak >= 20:
+            st.info("🏅 20-Day Streak! You're on fire!")
+        
         if streak >= 30:
             st.success("🔥 30-Day Streak! Legendary!")
-        elif streak >= 20:
-            st.info("🏅 20-Day Streak! You're on fire!")
-        elif streak >= 10:
-            st.info("🎉 10-Day Streak! Congrats!")
+
 
         # Full meat-free weeks (Monday to Sunday)
         full_weeks = 0
