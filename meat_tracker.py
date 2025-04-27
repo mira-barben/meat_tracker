@@ -111,17 +111,16 @@ if username:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
         # --- Achievements ---
-        # Streak milestones
-        if streak >= 10:
-            st.info("🎉 10-Day Streak! Congrats!")
+        # Streak milestones based on longest streak ever
+        if longest_streak >= 10:
+            st.info("🎉 You've had a 10-day streak! Amazing!")
         
-        if streak >= 20:
-            st.info("🏅 20-Day Streak! You're on fire!")
+        if longest_streak >= 20:
+            st.info("🏅 You've hit a 20-day streak! You're on fire!")
         
-        if streak >= 30:
-            st.success("🔥 30-Day Streak! Legendary!")
-
-
+        if longest_streak >= 30:
+            st.success("🔥 You've had a 30-day streak! Legendary!")
+        
         # Full meat-free weeks (Monday to Sunday)
         full_weeks = 0
         df_zero_filled = df_grouped.fillna(999)  # Use 999 to catch unlogged days
