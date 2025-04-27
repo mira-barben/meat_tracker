@@ -133,8 +133,7 @@ if username:
             st.markdown(f"""
             <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
                 <strong>🌿 You’ve completed {full_weeks} full meat-free week{'s' if full_weeks > 1 else ''}!</strong><br>
-                💚🐄🐖🐥🐏🐟💚<br>
-                🌿Keep it up!
+                💚🐄🐖🐥🐏🐟💚 Keep it up!<br>
             </div>
             """, unsafe_allow_html=True)
 
