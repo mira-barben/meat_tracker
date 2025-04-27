@@ -116,6 +116,8 @@ if username:
             st.success("🔥 30-Day Streak! Legendary!")
         elif streak >= 20:
             st.info("🏅 20-Day Streak! You're on fire!")
+        elif streak >= 10:
+            st.info("🎉 10-Day Streak! Congrats!")
 
         # Full meat-free weeks (Monday to Sunday)
         full_weeks = 0
@@ -134,6 +136,21 @@ if username:
             <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
                 <strong>🌿 You’ve completed {full_weeks} full meat-free week{'s' if full_weeks > 1 else ''}!</strong><br>
                 <strong> 💚 Keep it up! </strong> 🐄🐖🐥🐏🐟 <br>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # --- Lives Saved Estimation ---
+        meat_free_days = (df_grouped == 0).sum()
+        
+        # Symbolic conversion (1 life saved for every 7 meat-free days)
+        lives_saved = meat_free_days // 7
+        
+        # Display the result
+        if lives_saved > 0:
+            st.markdown(f"""
+            <div style='background-color:#e0f7e9;padding:20px;border-radius:10px;border-left:5px solid green;'>
+                <strong>🌟 Impact So Far</strong><br><br>
+                💚 You've saved approximately {lives_saved} live{'s' if lives_saved > 1 else ''}! Keep going! 🌱
             </div>
             """, unsafe_allow_html=True)
 
