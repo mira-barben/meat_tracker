@@ -112,14 +112,20 @@ if username:
 
         # --- Achievements ---
         # Streak milestones based on longest streak ever
-        if longest_streak >= 10:
-            st.info("🎉 You've had a 10-day streak! Amazing!")
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            if longest_streak >= 10:
+                st.info("🎉 10-day streak! Amazing!")
         
-        if longest_streak >= 20:
-            st.info("🏅 You've hit a 20-day streak! You're on fire!")
+        with col2:
+            if longest_streak >= 20:
+                st.success("🏅 20-day streak! You're on fire!")
         
-        if longest_streak >= 30:
-            st.success("🔥 You've had a 30-day streak! Legendary!")
+        with col3:
+            if longest_streak >= 30:
+                st.success("🔥 30-day streak! Legendary!")
+
         
         # Full meat-free weeks (Monday to Sunday)
         full_weeks = 0
