@@ -130,7 +130,7 @@ if username:
                     full_weeks += 1
 
         if full_weeks > 0:
-            st.image("https://freefromharm.org/wp-content/uploads/2012/07/mama_cow_and_baby_from_book-redu-1.jpg", caption="❤️", use_column_width=True)
+            st.image("https://images.unsplash.com/photo-1520162495797-09c5720778a4", caption="❤️", use_column_width=True)
             st.success(f"🌿 You’ve completed {full_weeks} full meat-free week{'s' if full_weeks > 1 else ''}!")
 
         # --- Plotting (Bar Chart) --- 
