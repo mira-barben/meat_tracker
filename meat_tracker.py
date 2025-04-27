@@ -130,7 +130,9 @@ if username:
                     full_weeks += 1
 
         if full_weeks > 0:
-            st.success(f"🌿 You’ve completed {full_weeks} full meat-free week{'s' if full_weeks > 1 else ''}! \n💚🐄🐖🐥🐏🐟💚 \n🌱Keep it up!")
+            st.success(f"""🌿 You’ve completed {full_weeks} full meat-free week{'s' if full_weeks > 1 else ''}! 
+            💚🐄🐖🐥🐏🐟💚 
+            🌱Keep it up!""")
 
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
