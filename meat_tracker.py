@@ -147,22 +147,6 @@ if username:
             </div>
             """, unsafe_allow_html=True)
 
-        # --- Lives Saved Estimation ---
-        #meat_free_days = (df_grouped == 0).sum()
-        
-        # Symbolic conversion (1 life saved for every 7 meat-free days)
-        #lives_saved = meat_free_days // 7
-        
-        # Display the result
-        #if lives_saved > 0:
-           # st.markdown(f"""
-            #<div style='background-color:#e0f7e9;padding:20px;border-radius:10px;border-left:5px solid green;'>
-             #   <strong>🌟 Impact So Far</strong><br><br>
-             #   💚 You've saved approximately {lives_saved} live{'s' if lives_saved > 1 else ''}! Keep going! 🌱
-           # </div>
-           # """, unsafe_allow_html=True)
-
-
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
         
