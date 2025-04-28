@@ -147,7 +147,7 @@ if username:
             """, unsafe_allow_html=True)
 
         # --- Plotting (Bar Chart) --- 
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(10, 5))
         
         # Plot all days with grey bars (1 for unlogged)
         ax.bar(df_grouped_filled.index, df_grouped_filled.values, color='grey', alpha=0.6, label="Unlogged Day")
