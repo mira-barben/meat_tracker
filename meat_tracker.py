@@ -126,18 +126,21 @@ if username:
             if longest_streak >= 30:
                 st.success("🔥 30-day streak! Legendary!")
 
-        
-        # Full meat-free weeks (Monday to Sunday)
+        # --- Full Meat-Free Weeks (Monday to Sunday) ---
         full_weeks = 0
         df_zero_filled = df_grouped.fillna(999)  # Use 999 to catch unlogged days
-
+        
+        first_meat_free_week = False  # Flag to track if the first meat-free week is completed
+        
         for i in range(len(df_zero_filled) - 6):
             week = df_zero_filled.iloc[i:i+7]
             week_dates = week.index
-
+        
             if week_dates[0].weekday() == 0 and week_dates[-1].weekday() == 6:
-                if all(week == 0):
+                if all(week == 0):  # This means it's a full meat-free week
                     full_weeks += 1
+                    if full_weeks == 1:
+                        first_meat_free_week = True  # Set the flag when the first meat-free week is completed
 
         if full_weeks > 0:
             st.markdown(f"""
@@ -147,21 +150,14 @@ if username:
             </div>
             """, unsafe_allow_html=True)
 
-        # --- Lives Saved Estimation ---
-        #meat_free_days = (df_grouped == 0).sum()
-        
-        # Symbolic conversion (1 life saved for every 7 meat-free days)
-        #lives_saved = meat_free_days // 7
-        
-        # Display the result
-        #if lives_saved > 0:
-           # st.markdown(f"""
-            #<div style='background-color:#e0f7e9;padding:20px;border-radius:10px;border-left:5px solid green;'>
-             #   <strong>🌟 Impact So Far</strong><br><br>
-             #   💚 You've saved approximately {lives_saved} live{'s' if lives_saved > 1 else ''}! Keep going! 🌱
-           # </div>
-           # """, unsafe_allow_html=True)
-
+        # --- Negative Achievement for Logging Meat After Meat-Free Week ---
+        if first_meat_free_week and df_grouped[df_grouped > 0].index.min() > df_zero_filled.index[6]:  # After the first full meat-free week
+            st.markdown("""
+            <div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
+                <strong>🚨 Oops! You logged meat after your first meat-free week!</strong><br>
+                <strong>Don't worry, it's a small setback. Keep going!</strong>
+            </div>
+            """, unsafe_allow_html=True)
 
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -219,3 +215,4 @@ if username:
 
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
