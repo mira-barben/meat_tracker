@@ -92,13 +92,13 @@ if username:
         # Set unlogged days (NaN) to 1 for grey bar representation
         df_grouped_filled = df_grouped.fillna(1)
 
-        # --- Track Active and Archived Achievements ---
+        # --- Track Active and Archived Achievements --- 
         active_achievements = []
         archived_achievements = []
-
-        # --- Current and Longest streaks ---
+        
+        # --- Current and Longest streaks --- 
         today = pd.Timestamp(datetime.today().date())
-
+        
         longest_streak = 0
         streak = 0
         for val in df_grouped.values:
@@ -107,13 +107,13 @@ if username:
                 longest_streak = max(longest_streak, streak)
             else:
                 streak = 0
-
+        
         col1, col2 = st.columns(2)
         with col1:
             st.metric("🥗 Days without meat", f"{streak} days")
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
-
+        
         # --- Achievements ---
         # Streak milestones based on longest streak ever
         if longest_streak >= 10 and "10-day streak" not in active_achievements:
@@ -149,7 +149,7 @@ if username:
             """, unsafe_allow_html=True)
             archived_achievements = active_achievements.copy()  # Move all active achievements to archived
             active_achievements.clear()  # Clear active achievements
-
+        
         # --- Display Active Achievements ---
         if active_achievements:
             st.markdown("### Active Achievements")
@@ -167,7 +167,7 @@ if username:
                         <strong>💚 Well done, you're doing great! </strong> 🐄🐖🐥🐏🐟 <br>
                     </div>
                     """, unsafe_allow_html=True)
-
+        
         # --- Display Archived Achievements ---
         if archived_achievements:
             st.markdown("### Archived Achievements")
