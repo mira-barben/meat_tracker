@@ -147,6 +147,39 @@ if username:
             </div>
             """, unsafe_allow_html=True)
 
+        # --- Negative Achievements (if user logs meat after achieving a streak) ---
+        # Check if the user has logged meat again after earning a milestone
+        if meat_events > 0:
+            if longest_streak >= 7:
+                st.error("❌ Oops! You logged meat after your first meat-free week! Don't worry, it's a small setback. Keep going!")
+            elif longest_streak >= 10:
+                st.error("❌ Oops! You logged meat after your 10-day streak! Don't worry, it's a small setback. Keep going!")
+            elif longest_streak >= 20:
+                st.error("❌ Oops! You logged meat after your 20-day streak! Don't worry, it's a small setback. Keep going!")
+            elif longest_streak >= 30:
+                st.error("❌ Oops! You logged meat after your 30-day streak! Don't worry, it's a small setback. Keep going!")
+
+        # --- Archived Achievements ---
+        # Let's keep track of the archived achievements in a list and show them below
+        archived_achievements = []
+
+        if longest_streak >= 7:
+            archived_achievements.append("Meat-Free Week Achievement")
+        if longest_streak >= 10:
+            archived_achievements.append("10-Day Streak Achievement")
+        if longest_streak >= 20:
+            archived_achievements.append("20-Day Streak Achievement")
+        if longest_streak >= 30:
+            archived_achievements.append("30-Day Streak Achievement")
+
+        # Show the archived achievements below
+        if archived_achievements:
+            st.subheader("Archived Achievements")
+            for achievement in archived_achievements:
+                st.markdown(f"<div style='background-color:#f8d7da;padding:10px;border-radius:10px;'>"
+                            f"<strong>{achievement}</strong><br>"
+                            f"Oops, you logged meat after reaching this milestone! But don't worry, you can earn it again!</div>", unsafe_allow_html=True)
+
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
         
@@ -200,6 +233,6 @@ if username:
             mime='text/csv'
         )
 
-
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
