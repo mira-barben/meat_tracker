@@ -190,7 +190,7 @@ if username:
 
         # --- Add Space Between Plot and Achievements ---
         st.markdown("<br><br><br>", unsafe_allow_html=True)  # Adding extra space with <br> tags
-
+        
         # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
