@@ -144,12 +144,10 @@ if username:
         
         # --- Negative Achievement for Logging Meat After Meat-Free Week ---
         if first_meat_free_week and df_grouped[df_grouped > 0].index.min() > df_zero_filled.index[6]:  # After the first full meat-free week
-            st.markdown("""
-            <div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
+            st.markdown("""<div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
                 <strong>🚨 Oops! You logged meat after your first meat-free week!</strong><br>
                 <strong>Don't worry, it's a small setback. Keep going!</strong>
-            </div>
-            """, unsafe_allow_html=True)
+            </div>""", unsafe_allow_html=True)
             archived_achievements = active_achievements.copy()  # Move all active achievements to archived
             active_achievements.clear()  # Clear active achievements
 
@@ -158,12 +156,6 @@ if username:
             st.markdown("### Active Achievements")
             for achievement in active_achievements:
                 st.markdown(f"🎉 {achievement}")
-
-        # --- Display Archived Achievements ---
-        if archived_achievements:
-            st.markdown("### Archived Achievements")
-            for achievement in archived_achievements:
-                st.markdown(f"❌ {achievement}")
 
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -206,7 +198,13 @@ if username:
         
         # Show the plot
         st.pyplot(fig)
-        
+
+        # --- Display Archived Achievements below the plot ---
+        if archived_achievements:
+            st.markdown("### Archived Achievements")
+            for achievement in archived_achievements:
+                st.markdown(f"❌ {achievement}")
+
         # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
@@ -217,7 +215,6 @@ if username:
             file_name=f"{username}_meat_tracker_log.csv",
             mime='text/csv'
         )
-
 
 else:
     st.warning("Please enter your username in the sidebar to continue.")
