@@ -165,22 +165,39 @@ if username:
 
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
-
+        
         # Plot all days with grey bars (1 for unlogged)
         ax.bar(df_grouped_filled.index, df_grouped_filled.values, color='grey', alpha=0.6, label="Unlogged (Default)")
-
+        
         # Plotting the meat-eating events (green bars) on top of the grey bars
         ax.bar(df_grouped.index[df_grouped > 0], df_grouped[df_grouped > 0], color='green', label="Logged Meat Events")
-
+        
+        # Set labels for x and y axis
         ax.set_xlabel("Time")
         ax.set_ylabel("Meat-Eating Events")
         ax.tick_params(axis='y')
-
-        # Rotate the x-axis labels for better readability
-        plt.xticks(rotation=45)
+        
+        # Define weekly ticks (every 7 days)
+        weekly_ticks = pd.date_range(start=df_grouped_filled.index[0], end=df_grouped_filled.index[-1], freq='W-MON')
+        
+        # Combine weekly and daily ticks
+        daily_ticks = df_grouped_filled.index
+        
+        # Set the positions for the ticks and labels
+        ax.set_xticks(daily_ticks)
+        ax.set_xticks(weekly_ticks, minor=True)
+        
+        # Format x-axis labels
+        ax.set_xticklabels(daily_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')
+        ax.set_xticklabels(weekly_ticks.strftime('%d %b'), rotation=45, ha='right', minor=True)
+        
+        # Display legend and tight layout
+        ax.legend()
         plt.tight_layout()
+        
+        # Show the plot
         st.pyplot(fig)
-
+        
         # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
