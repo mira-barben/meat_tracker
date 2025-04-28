@@ -188,30 +188,9 @@ if username:
         # Show the plot
         st.pyplot(fig)
 
-        # --- Add Space with `st.empty()` for a Gap ---
-        st.empty()  # Add empty container to force layout gap before achievements
+        # --- Add Space for the Gap ---
+        st.markdown("<br><br>", unsafe_allow_html=True)  # Adding space above the achievement section
 
-        # --- Achievements ---
-        # Streak milestones based on longest streak ever
-        full_weeks = 0
-        df_zero_filled = df_grouped.fillna(999)  # Use 999 to catch unlogged days
-
-        for i in range(len(df_zero_filled) - 6):
-            week = df_zero_filled.iloc[i:i+7]
-            week_dates = week.index
-
-            if week_dates[0].weekday() == 0 and week_dates[-1].weekday() == 6:
-                if all(week == 0):
-                    full_weeks += 1
-
-        if full_weeks > 0:
-            st.markdown(f"""
-            <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
-                <strong>🌿 You’ve completed {full_weeks} full meat-free week{'s' if full_weeks > 1 else ''}!</strong><br>
-                <strong> 💚 Keep it up! </strong> 🐄🐖🐥🐏🐟 <br>
-            </div>
-            """, unsafe_allow_html=True)
-        
         # --- Download Button --- 
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
