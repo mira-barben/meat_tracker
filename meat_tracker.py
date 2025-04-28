@@ -182,10 +182,10 @@ if username:
         
         # Set the positions for the ticks and labels
         ax.set_xticks(df_grouped_filled.index)  # Set tick positions for each day
-        ax.set_xticks(weekly_ticks, minor=True)  # Set minor ticks on weekly basis
         
         # Set the tick labels only for the weekly ticks (e.g., Mondays)
-        ax.set_xticklabels(weekly_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')
+        ax.set_xticks(weekly_ticks)  # Position the weekly ticks on the x-axis
+        ax.set_xticklabels(weekly_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')  # Only label the weekly ticks
         
         # Minor ticks: Display small lines without labels
         ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')
