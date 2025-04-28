@@ -92,10 +92,6 @@ if username:
         # Set unlogged days (NaN) to 1 for grey bar representation
         df_grouped_filled = df_grouped.fillna(1)
 
-        # --- Track Active and Archived Achievements ---
-        active_achievements = []
-        archived_achievements = []
-
         # --- Current and Longest streaks ---
         today = pd.Timestamp(datetime.today().date())
 
@@ -116,54 +112,56 @@ if username:
 
         # --- Achievements ---
         # Streak milestones based on longest streak ever
-        if longest_streak >= 10 and "10-day streak" not in active_achievements:
-            active_achievements.append("10-day streak")
-        if longest_streak >= 20 and "20-day streak" not in active_achievements:
-            active_achievements.append("20-day streak")
-        if longest_streak >= 30 and "30-day streak" not in active_achievements:
-            active_achievements.append("30-day streak")
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            if longest_streak >= 10:
+                st.info("🎉 10-day streak! Amazing!")
+        
+        with col2:
+            if longest_streak >= 20:
+                st.success("🏅 20-day streak! You're on fire!")
+        
+        with col3:
+            if longest_streak >= 30:
+                st.success("🔥 30-day streak! Legendary!")
+
         
         # Full meat-free weeks (Monday to Sunday)
         full_weeks = 0
         df_zero_filled = df_grouped.fillna(999)  # Use 999 to catch unlogged days
-        
-        first_meat_free_week = False  # Flag to track if the first meat-free week is completed
-        
+
         for i in range(len(df_zero_filled) - 6):
             week = df_zero_filled.iloc[i:i+7]
             week_dates = week.index
-        
+
             if week_dates[0].weekday() == 0 and week_dates[-1].weekday() == 6:
-                if all(week == 0):  # This means it's a full meat-free week
+                if all(week == 0):
                     full_weeks += 1
-                    if full_weeks == 1:
-                        first_meat_free_week = True  # Set the flag when the first meat-free week is completed
-        
-        if full_weeks > 0 and "1-week streak" not in active_achievements:
-            active_achievements.append("1-week streak")
-        
-        # --- Negative Achievement for Logging Meat After Meat-Free Week ---
-        if first_meat_free_week and df_grouped[df_grouped > 0].index.min() > df_zero_filled.index[6]:  # After the first full meat-free week
-            st.markdown("""
-            <div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
-                <strong>🚨 Oops! You logged meat after your first meat-free week!</strong><br>
-                <strong>Don't worry, it's a small setback. Keep going!</strong>
+
+        if full_weeks > 0:
+            st.markdown(f"""
+            <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
+                <strong>🌿 You’ve completed {full_weeks} full meat-free week{'s' if full_weeks > 1 else ''}!</strong><br>
+                <strong> 💚 Keep it up! </strong> 🐄🐖🐥🐏🐟 <br>
             </div>
             """, unsafe_allow_html=True)
-            archived_achievements = active_achievements.copy()  # Move all active achievements to archived
-            active_achievements.clear()  # Clear active achievements
 
-        # --- Display Active Achievements ---
-        if active_achievements:
-            st.markdown("### Active Achievements")
-            for achievement in active_achievements:
-                st.markdown(f"🎉 {achievement}")
+        # --- Lives Saved Estimation ---
+        #meat_free_days = (df_grouped == 0).sum()
+        
+        # Symbolic conversion (1 life saved for every 7 meat-free days)
+        #lives_saved = meat_free_days // 7
+        
+        # Display the result
+        #if lives_saved > 0:
+           # st.markdown(f"""
+            #<div style='background-color:#e0f7e9;padding:20px;border-radius:10px;border-left:5px solid green;'>
+             #   <strong>🌟 Impact So Far</strong><br><br>
+             #   💚 You've saved approximately {lives_saved} live{'s' if lives_saved > 1 else ''}! Keep going! 🌱
+           # </div>
+           # """, unsafe_allow_html=True)
 
-        # --- Display Archived Achievements ---
-        if archived_achievements:
-            st.markdown("### Archived Achievements")
-            for achievement in archived_achievements:
-                st.markdown(f"❌ {achievement}")
 
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
