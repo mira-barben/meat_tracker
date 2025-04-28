@@ -92,9 +92,10 @@ if username:
         # Set unlogged days (NaN) to 1 for grey bar representation
         df_grouped_filled = df_grouped.fillna(1)
 
-        # --- Current and Longest streaks ---
+        # --- Current streak ---
         today = pd.Timestamp(datetime.today().date())
 
+        # --- Longest streak ---
         longest_streak = 0
         streak = 0
         for val in df_grouped.values:
@@ -110,88 +111,25 @@ if username:
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
 
-        # --- Achievements ---
-        # Streak milestones based on longest streak ever
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            if longest_streak >= 10:
-                st.info("🎉 10-day streak! Amazing!")
-        
-        with col2:
-            if longest_streak >= 20:
-                st.success("🏅 20-day streak! You're on fire!")
-        
-        with col3:
-            if longest_streak >= 30:
-                st.success("🔥 30-day streak! Legendary!")
-
-        # Full meat-free weeks (Monday to Sunday)
-        full_weeks = 0
-        df_zero_filled = df_grouped.fillna(999)  # Use 999 to catch unlogged days
-
-        for i in range(len(df_zero_filled) - 6):
-            week = df_zero_filled.iloc[i:i+7]
-            week_dates = week.index
-
-            if week_dates[0].weekday() == 0 and week_dates[-1].weekday() == 6:
-                if all(week == 0):
-                    full_weeks += 1
-
-        if full_weeks > 0:
-            st.markdown(f"""
-            <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
-                <strong>🌿 You’ve completed {full_weeks} full meat-free week{'s' if full_weeks > 1 else ''}!</strong><br>
-                <strong> 💚 Keep it up! </strong> 🐄🐖🐥🐏🐟 <br>
-            </div>
-            """, unsafe_allow_html=True)
-
         # --- Plotting (Bar Chart) --- 
-        fig, ax = plt.subplots(figsize=(10, 5))
-        
+        fig, ax = plt.subplots(figsize=(10, 6))
+
         # Plot all days with grey bars (1 for unlogged)
-        ax.bar(df_grouped_filled.index, df_grouped_filled.values, color='grey', alpha=0.6, label="Unlogged Day")
-        
+        ax.bar(df_grouped_filled.index, df_grouped_filled.values, color='grey', alpha=0.6, label="Unlogged (Default)")
+
         # Plotting the meat-eating events (green bars) on top of the grey bars
-        ax.bar(df_grouped.index[df_grouped > 0], df_grouped[df_grouped > 0], color='green', label="Logged Meat Eating")
-        
-        # Set labels for x and y axis
+        ax.bar(df_grouped.index[df_grouped > 0], df_grouped[df_grouped > 0], color='green', label="Logged Meat Events")
+
         ax.set_xlabel("Time")
         ax.set_ylabel("Meat-Eating Events")
         ax.tick_params(axis='y')
-        
-        # Define weekly ticks (every 7 days, i.e., Mondays)
-        weekly_ticks = pd.date_range(start=df_grouped_filled.index[0], end=df_grouped_filled.index[-1], freq='W-MON')
-        
-        # Set the positions for the ticks and labels
-        ax.set_xticks(df_grouped_filled.index)  # Set tick positions for each day
-        
-        # Set the tick labels only for the weekly ticks (e.g., Mondays)
-        ax.set_xticks(weekly_ticks)  # Position the weekly ticks on the x-axis
-        ax.set_xticklabels(weekly_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')  # Only label the weekly ticks
-        
-        # Minor ticks: Display small lines without labels
-        ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')
-        
-        # Major ticks: Make them a bit longer for the weekly labels
-        ax.tick_params(axis='x', which='major', length=7, width=2, color='black')
-        
-        # Display legend and tight layout
-        ax.legend()
-        
-        # --- Y-Axis as Whole Numbers ---
-        ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
-        
-        # Tight layout for the plot
+
+        # Rotate the x-axis labels for better readability
+        plt.xticks(rotation=45)
         plt.tight_layout()
-        
-        # Show the plot
         st.pyplot(fig)
 
-        # --- Add Space for the Gap ---
-        st.markdown("<br><br>", unsafe_allow_html=True)  # Adding space above the achievement section
-
-        # --- Download Button --- 
+        # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
         df_download['date'] = df_download['date'].dt.strftime('%Y-%d-%m')  # European format
