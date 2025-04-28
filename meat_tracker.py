@@ -126,6 +126,7 @@ if username:
             if longest_streak >= 30:
                 st.success("🔥 30-day streak! Legendary!")
 
+        
         # Full meat-free weeks (Monday to Sunday)
         full_weeks = 0
         df_zero_filled = df_grouped.fillna(999)  # Use 999 to catch unlogged days
@@ -145,6 +146,22 @@ if username:
                 <strong> 💚 Keep it up! </strong> 🐄🐖🐥🐏🐟 <br>
             </div>
             """, unsafe_allow_html=True)
+
+        # --- Lives Saved Estimation ---
+        #meat_free_days = (df_grouped == 0).sum()
+        
+        # Symbolic conversion (1 life saved for every 7 meat-free days)
+        #lives_saved = meat_free_days // 7
+        
+        # Display the result
+        #if lives_saved > 0:
+           # st.markdown(f"""
+            #<div style='background-color:#e0f7e9;padding:20px;border-radius:10px;border-left:5px solid green;'>
+             #   <strong>🌟 Impact So Far</strong><br><br>
+             #   💚 You've saved approximately {lives_saved} live{'s' if lives_saved > 1 else ''}! Keep going! 🌱
+           # </div>
+           # """, unsafe_allow_html=True)
+
 
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -187,9 +204,6 @@ if username:
         
         # Show the plot
         st.pyplot(fig)
-
-        # --- Add Space Between Plot and Achievements ---
-        st.markdown("<br><br><br>", unsafe_allow_html=True)  # Adding extra space with <br> tags
         
         # --- Download Button ---
         df_download = df_grouped.reset_index()
@@ -202,5 +216,7 @@ if username:
             mime='text/csv'
         )
 
+
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
