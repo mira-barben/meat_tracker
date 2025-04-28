@@ -187,11 +187,14 @@ if username:
         ax.set_xticks(weekly_ticks)  # Position the weekly ticks on the x-axis
         ax.set_xticklabels(weekly_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')  # Only label the weekly ticks
         
-        # Minor ticks: Display small lines without labels
-        ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')
+        # --- Minor ticks for every single day ---
+        ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')  # Small ticks for each day
         
-        # Major ticks: Make them a bit longer for the weekly labels
-        ax.tick_params(axis='x', which='major', length=7, width=2, color='black')
+        # --- Major ticks for weekly labels (e.g., Mondays) ---
+        ax.tick_params(axis='x', which='major', length=7, width=2, color='black')  # Larger ticks for weekly labels
+        
+        # Enable minor ticks explicitly to display them
+        ax.minorticks_on()
         
         # Display legend and tight layout
         ax.legend()
