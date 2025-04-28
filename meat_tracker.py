@@ -189,7 +189,7 @@ if username:
         st.pyplot(fig)
 
         # --- Add Space Between Plot and Achievements ---
-        st.markdown("<br><br>", unsafe_allow_html=True)  # Adds space between the plot and the achievement message
+        st.markdown("<br><br><br>", unsafe_allow_html=True)  # Adding extra space with <br> tags
 
         # --- Download Button ---
         df_download = df_grouped.reset_index()
