@@ -144,7 +144,7 @@ if username:
             <div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
                 <strong>🚨 Oh no! You ate meat after reaching such a nice streak! 👎</strong><br>
                 <strong>💚 Don't worry though, it's just a small setback.</strong><br>
-                <strong>🐄 Get right back to saving animals and unlock your achievements again! 💚</strong>
+                <strong>🐄 Get right back to saving animals and unlock your achievements again!</strong>
             </div>
             """, unsafe_allow_html=True)
             archived_achievements = active_achievements.copy()  # Move all active achievements to archived
