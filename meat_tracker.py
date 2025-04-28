@@ -172,7 +172,7 @@ if username:
         if archived_achievements:
             st.markdown("### Archived Achievements")
             for achievement in archived_achievements:
-                st.markdown(f"❌ {achievement}")
+                st.markdown(f"🌿 {achievement}")
 
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
