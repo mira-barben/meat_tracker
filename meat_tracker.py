@@ -127,8 +127,6 @@ if username:
         full_weeks = 0
         df_zero_filled = df_grouped.fillna(999)  # Use 999 to catch unlogged days
         
-        first_meat_free_week = False  # Flag to track if the first meat-free week is completed
-        
         for i in range(len(df_zero_filled) - 6):
             week = df_zero_filled.iloc[i:i+7]
             week_dates = week.index
@@ -136,18 +134,18 @@ if username:
             if week_dates[0].weekday() == 0 and week_dates[-1].weekday() == 6:
                 if all(week == 0):  # This means it's a full meat-free week
                     full_weeks += 1
-                    if full_weeks == 1:
-                        first_meat_free_week = True  # Set the flag when the first meat-free week is completed
         
         if full_weeks > 0 and "1-week streak" not in active_achievements:
             active_achievements.append("1-week streak")
         
         # --- Negative Achievement for Logging Meat After Meat-Free Week ---
-        if first_meat_free_week and df_grouped[df_grouped > 0].index.min() > df_zero_filled.index[6]:  # After the first full meat-free week
-            st.markdown("""<div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
+        if full_weeks > 0 and df_grouped[df_grouped > 0].index.min() > df_zero_filled.index[6]:
+            st.markdown("""
+            <div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
                 <strong>🚨 Oops! You logged meat after your first meat-free week!</strong><br>
                 <strong>Don't worry, it's a small setback. Keep going!</strong>
-            </div>""", unsafe_allow_html=True)
+            </div>
+            """, unsafe_allow_html=True)
             archived_achievements = active_achievements.copy()  # Move all active achievements to archived
             active_achievements.clear()  # Clear active achievements
 
@@ -155,7 +153,25 @@ if username:
         if active_achievements:
             st.markdown("### Active Achievements")
             for achievement in active_achievements:
-                st.markdown(f"🎉 {achievement}")
+                if achievement == "10-day streak":
+                    st.info("🎉 10-day streak! Amazing!")
+                elif achievement == "20-day streak":
+                    st.success("🏅 20-day streak! You're on fire!")
+                elif achievement == "30-day streak":
+                    st.success("🔥 30-day streak! Legendary!")
+                elif achievement == "1-week streak":
+                    st.markdown(f"""
+                    <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
+                        <strong>🌿 You’ve completed a full 1-week meat-free streak!</strong><br>
+                        <strong>💚 Well done, you're doing great! </strong> 🐄🐖🐥🐏🐟 <br>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+        # --- Display Archived Achievements ---
+        if archived_achievements:
+            st.markdown("### Archived Achievements")
+            for achievement in archived_achievements:
+                st.markdown(f"❌ {achievement}")
 
         # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -198,13 +214,7 @@ if username:
         
         # Show the plot
         st.pyplot(fig)
-
-        # --- Display Archived Achievements below the plot ---
-        if archived_achievements:
-            st.markdown("### Archived Achievements")
-            for achievement in archived_achievements:
-                st.markdown(f"❌ {achievement}")
-
+        
         # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
@@ -215,6 +225,7 @@ if username:
             file_name=f"{username}_meat_tracker_log.csv",
             mime='text/csv'
         )
+
 
 else:
     st.warning("Please enter your username in the sidebar to continue.")
