@@ -190,8 +190,16 @@ if username:
         # Minor ticks: Display small lines without labels
         ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')
         
+        # Major ticks: Make them a bit longer for the weekly labels
+        ax.tick_params(axis='x', which='major', length=7, width=2, color='black')
+        
         # Display legend and tight layout
         ax.legend()
+        
+        # --- Y-Axis as Whole Numbers ---
+        ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+        
+        # Tight layout for the plot
         plt.tight_layout()
         
         # Show the plot
