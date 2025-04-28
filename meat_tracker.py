@@ -177,19 +177,18 @@ if username:
         ax.set_ylabel("Meat-Eating Events")
         ax.tick_params(axis='y')
         
-        # Define weekly ticks (every 7 days)
+        # Define weekly ticks (every 7 days, i.e., Mondays)
         weekly_ticks = pd.date_range(start=df_grouped_filled.index[0], end=df_grouped_filled.index[-1], freq='W-MON')
         
-        # Combine weekly and daily ticks
-        daily_ticks = df_grouped_filled.index
-        
         # Set the positions for the ticks and labels
-        ax.set_xticks(daily_ticks)
-        ax.set_xticks(weekly_ticks, minor=True)
+        ax.set_xticks(df_grouped_filled.index)  # Set tick positions for each day
+        ax.set_xticks(weekly_ticks, minor=True)  # Set minor ticks on weekly basis
         
-        # Format x-axis labels
-        ax.set_xticklabels(daily_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')
-        ax.set_xticklabels(weekly_ticks.strftime('%d %b'), rotation=45, ha='right', minor=True)
+        # Set the tick labels only for the weekly ticks (e.g., Mondays)
+        ax.set_xticklabels(weekly_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')
+        
+        # Minor ticks: Display small lines without labels
+        ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')
         
         # Display legend and tight layout
         ax.legend()
