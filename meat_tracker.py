@@ -142,8 +142,9 @@ if username:
         if full_weeks > 0 and df_grouped[df_grouped > 0].index.min() > df_zero_filled.index[6]:
             st.markdown("""
             <div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
-                <strong>🚨 Oops! You logged meat after your first meat-free week!</strong><br>
-                <strong>Don't worry, it's a small setback. Keep going!</strong>
+                <strong>🚨 Oh no! You ate meat after reaching such a nice streak! 👎</strong><br>
+                <strong>Don't worry, it's just a small setback though.</strong>
+                <strong>Get right back to saving animals! 💚</strong>
             </div>
             """, unsafe_allow_html=True)
             archived_achievements = active_achievements.copy()  # Move all active achievements to archived
