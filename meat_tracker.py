@@ -167,10 +167,10 @@ if username:
         fig, ax = plt.subplots(figsize=(10, 6))
         
         # Plot all days with grey bars (1 for unlogged)
-        ax.bar(df_grouped_filled.index, df_grouped_filled.values, color='grey', alpha=0.6, label="Unlogged (Default)")
+        ax.bar(df_grouped_filled.index, df_grouped_filled.values, color='grey', alpha=0.6, label="Unlogged Day")
         
         # Plotting the meat-eating events (green bars) on top of the grey bars
-        ax.bar(df_grouped.index[df_grouped > 0], df_grouped[df_grouped > 0], color='green', label="Logged Meat Events")
+        ax.bar(df_grouped.index[df_grouped > 0], df_grouped[df_grouped > 0], color='green', label="Logged Meat Eating")
         
         # Set labels for x and y axis
         ax.set_xlabel("Time")
@@ -187,14 +187,11 @@ if username:
         ax.set_xticks(weekly_ticks)  # Position the weekly ticks on the x-axis
         ax.set_xticklabels(weekly_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')  # Only label the weekly ticks
         
-        # --- Minor ticks for every single day ---
-        ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')  # Small ticks for each day
+        # Minor ticks: Display small lines without labels
+        ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')
         
-        # --- Major ticks for weekly labels (e.g., Mondays) ---
-        ax.tick_params(axis='x', which='major', length=7, width=2, color='black')  # Larger ticks for weekly labels
-        
-        # Enable minor ticks explicitly to display them
-        ax.minorticks_on()
+        # Major ticks: Make them a bit longer for the weekly labels
+        ax.tick_params(axis='x', which='major', length=7, width=2, color='black')
         
         # Display legend and tight layout
         ax.legend()
@@ -218,6 +215,7 @@ if username:
             file_name=f"{username}_meat_tracker_log.csv",
             mime='text/csv'
         )
+
 
 else:
     st.warning("Please enter your username in the sidebar to continue.")
