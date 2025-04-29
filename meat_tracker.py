@@ -178,7 +178,7 @@ if username:
                     st.markdown(f"""
                         <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
                             <strong>🌿 You’ve completed a full 1-week meat-free streak!</strong><br>
-                            <strong>💚 Well done, keep it up! </strong> 🐄🐖🐥
+                            <strong>💚 Well done, keep it up! </strong> 🐄🐖🐥🐑🐟
                         </div>
                     """, unsafe_allow_html=True)
         
