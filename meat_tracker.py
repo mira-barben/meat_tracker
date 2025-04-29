@@ -117,10 +117,15 @@ if username:
         with col2:
             st.metric("🏆 Longest streak", f"{longest_streak} days")
         
-        # --- Achievements ---
+        # --- Achievements --- (Reactivate archived achievements)
         # Streak milestones based on longest streak ever
-        if longest_streak >= 10 and "10-day streak" not in active_achievements:
-            active_achievements.append("10-day streak")
+        if longest_streak >= 10:
+            if "10-day streak" not in active_achievements and "10-day streak" in archived_achievements:
+                archived_achievements.remove("10-day streak")
+                active_achievements.append("10-day streak")
+            elif "10-day streak" not in active_achievements:
+                active_achievements.append("10-day streak")
+        
         if longest_streak >= 20 and "20-day streak" not in active_achievements:
             active_achievements.append("20-day streak")
         if longest_streak >= 30 and "30-day streak" not in active_achievements:
@@ -195,7 +200,7 @@ if username:
             for achievement in archived_achievements:
                 st.markdown(f"🌿 {achievement}")
 
-        # --- Plotting ---
+        # --- Plotting --- (Same as before)
         fig, ax = plt.subplots(figsize=(10, 6))
         
         # Plot all days with grey bars (1 for unlogged)
