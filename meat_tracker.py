@@ -108,6 +108,12 @@ if username:
             else:
                 streak = 0
         
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("🥗 Days without meat", f"{streak} days")
+        with col2:
+            st.metric("🏆 Longest streak", f"{longest_streak} days")
+        
         # --- Achievements ---
         # Streak milestones based on longest streak ever
         if longest_streak >= 10 and "10-day streak" not in active_achievements:
@@ -132,7 +138,7 @@ if username:
         if full_weeks > 0 and "1-week streak" not in active_achievements:
             active_achievements.append("1-week streak")
         
-        # --- Negative Achievement for Logging Meat After Meat-Free Week --- 
+        # --- Negative Achievement for Logging Meat After Meat-Free Week ---
         if full_weeks > 0 and df_grouped[df_grouped > 0].index.min() > df_zero_filled.index[6]:
             st.markdown("""
             <div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
@@ -144,22 +150,6 @@ if username:
             archived_achievements = active_achievements.copy()  # Move all active achievements to archived
             active_achievements.clear()  # Clear active achievements
         
-        # --- Display "Back on Track" Positive Message ---
-        if len(archived_achievements) > 0 and "Back on track, keep it up!" not in active_achievements:
-            st.markdown("""
-            <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
-                <strong>🎉 Great! You're back on track! Keep it up! 💪</strong><br>
-                <strong>🐄 No more setbacks, let's reach those achievements again!</strong>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # --- Re-check if achievements are re-achieved after a setback ---
-        # Re-add achievements if they are re-earned
-        if longest_streak >= 10 and "10-day streak" not in active_achievements:
-            active_achievements.append("10-day streak")
-        if full_weeks > 0 and "1-week streak" not in active_achievements:
-            active_achievements.append("1-week streak")
-
         # --- Display Active Achievements ---
         if active_achievements:
             st.markdown("### Active Achievements")
@@ -174,7 +164,7 @@ if username:
                     st.markdown(f"""
                     <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
                         <strong>🌿 You’ve completed a full 1-week meat-free streak!</strong><br>
-                        <strong>💚 Well done, you're doing great! </strong> 🐄🐖🐥🐏🐟 <br>
+                        <strong>💚 Well done, keep it up! </strong> 🐄🐖🐥🐏🐟 <br>
                     </div>
                     """, unsafe_allow_html=True)
         
@@ -198,13 +188,34 @@ if username:
         ax.set_ylabel("Meat-Eating Events")
         ax.tick_params(axis='y')
         
-        # Define weekly ticks (every 7 days)
-        ax.set_xticks(pd.date_range(start=start_date, end=datetime.today(), freq='7D'))
-        ax.set_xticklabels(pd.date_range(start=start_date, end=datetime.today(), freq='7D').strftime('%b %d'))
-
+        # Define weekly ticks (every 7 days, i.e., Mondays)
+        weekly_ticks = pd.date_range(start=df_grouped_filled.index[0], end=df_grouped_filled.index[-1], freq='W-MON')
+        
+        # Set the positions for the ticks and labels
+        ax.set_xticks(df_grouped_filled.index)  # Set tick positions for each day
+        
+        # Set the tick labels only for the weekly ticks (e.g., Mondays)
+        ax.set_xticks(weekly_ticks)  # Position the weekly ticks on the x-axis
+        ax.set_xticklabels(weekly_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')  # Only label the weekly ticks
+        
+        # Minor ticks: Display small lines without labels
+        ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')
+        
+        # Major ticks: Make them a bit longer for the weekly labels
+        ax.tick_params(axis='x', which='major', length=7, width=2, color='black')
+        
+        # Display legend and tight layout
+        ax.legend()
+        
+        # --- Y-Axis as Whole Numbers ---
+        ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+        
+        # Tight layout for the plot
+        plt.tight_layout()
+        
+        # Show the plot
         st.pyplot(fig)
-
-
+        
         # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
@@ -216,6 +227,6 @@ if username:
             mime='text/csv'
         )
 
+
 else:
     st.warning("Please enter your username in the sidebar to continue.")
-
