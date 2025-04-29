@@ -96,7 +96,9 @@ if username:
         active_achievements = []
         archived_achievements = []
         negative_message = None  # To track if the negative message should appear
-        
+        previous_negative_message = False  # To track if the negative message was shown previously
+        positive_message = None  # For the "back on track" message
+
         # --- Current and Longest streaks --- 
         today = pd.Timestamp(datetime.today().date())
         
@@ -150,15 +152,17 @@ if username:
             """
             archived_achievements = active_achievements.copy()  # Move all active achievements to archived
             active_achievements.clear()  # Clear active achievements
+            previous_negative_message = True  # Track that the negative message was shown
 
         # --- Positive Achievement After Setback ---
-        if negative_message and meat_events == 0:
+        if previous_negative_message and meat_events == 0:
             negative_message = None  # Reset the negative message once the user logs no meat
-            st.markdown("""
+            positive_message = """
                 <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
                     <strong>🌿 Great! You're back on track! Keep it up!</strong><br>
                 </div>
-            """, unsafe_allow_html=True)
+            """
+            previous_negative_message = False  # Reset the tracking of the negative message
 
         # --- Display Active Achievements ---
         if active_achievements:
@@ -174,7 +178,7 @@ if username:
                     st.markdown(f"""
                         <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
                             <strong>🌿 You’ve completed a full 1-week meat-free streak!</strong><br>
-                            <strong>💚 Well done, keep it up! </strong> 🐄🐖🐥🐏🐟 <br>
+                            <strong>💚 Well done, keep it up! </strong> 🐄🐖🐥
                         </div>
                     """, unsafe_allow_html=True)
         
@@ -184,7 +188,14 @@ if username:
             for achievement in archived_achievements:
                 st.markdown(f"🌿 {achievement}")
 
-        # --- Plotting (Bar Chart) --- 
+        # --- Display Messages ---
+        if negative_message:
+            st.markdown(negative_message, unsafe_allow_html=True)
+        
+        if positive_message:
+            st.markdown(positive_message, unsafe_allow_html=True)
+
+        # --- Plotting ---
         fig, ax = plt.subplots(figsize=(10, 6))
         
         # Plot all days with grey bars (1 for unlogged)
@@ -225,7 +236,7 @@ if username:
         
         # Show the plot
         st.pyplot(fig)
-        
+
         # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
@@ -236,6 +247,5 @@ if username:
             file_name=f"{username}_meat_tracker_log.csv",
             mime='text/csv'
         )
-
 else:
     st.warning("Please enter your username in the sidebar to continue.")
