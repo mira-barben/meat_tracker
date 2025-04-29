@@ -178,15 +178,9 @@ if username:
                     st.markdown(f"""
                         <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
                             <strong>🌿 You’ve completed a full 1-week meat-free streak!</strong><br>
-                            <strong>💚 Well done, keep it up! </strong> 🐄🐖🐥
+                            <strong>💚 Well done, keep it up! </strong> 🐄🐖🐥🐑🐟
                         </div>
                     """, unsafe_allow_html=True)
-        
-        # --- Display Archived Achievements ---
-        if archived_achievements:
-            st.markdown("### Archived Achievements")
-            for achievement in archived_achievements:
-                st.markdown(f"🌿 {achievement}")
 
         # --- Display Messages ---
         if negative_message:
@@ -194,6 +188,12 @@ if username:
         
         if positive_message:
             st.markdown(positive_message, unsafe_allow_html=True)
+
+         # --- Display Archived Achievements ---
+        if archived_achievements:
+            st.markdown("### Archived Achievements")
+            for achievement in archived_achievements:
+                st.markdown(f"🌿 {achievement}")
 
         # --- Plotting ---
         fig, ax = plt.subplots(figsize=(10, 6))
