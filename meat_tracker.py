@@ -203,3 +203,19 @@ if username:
         ax.set_xticklabels(pd.date_range(start=start_date, end=datetime.today(), freq='7D').strftime('%b %d'))
 
         st.pyplot(fig)
+
+
+        # --- Download Button ---
+        df_download = df_grouped.reset_index()
+        df_download.columns = ['date', 'count']
+        df_download['date'] = df_download['date'].dt.strftime('%Y-%d-%m')  # European format
+        st.download_button(
+            label="📥 Download your data as CSV",
+            data=df_download.to_csv(index=False).encode('utf-8'),
+            file_name=f"{username}_meat_tracker_log.csv",
+            mime='text/csv'
+        )
+
+else:
+    st.warning("Please enter your username in the sidebar to continue.")
+
