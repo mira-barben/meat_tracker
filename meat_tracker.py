@@ -95,7 +95,7 @@ if username:
         # --- Track Active and Archived Achievements --- 
         active_achievements = []
         archived_achievements = []
-        recently_negative_achievement = False
+        negative_message = None  # To track if the negative message should appear
         
         # --- Current and Longest streaks --- 
         today = pd.Timestamp(datetime.today().date())
@@ -141,25 +141,24 @@ if username:
         
         # --- Negative Achievement for Logging Meat After Meat-Free Week ---
         if full_weeks > 0 and df_grouped[df_grouped > 0].index.min() > df_zero_filled.index[6]:
-            st.markdown("""<div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
-                <strong>🚨 Oh no! You ate meat after reaching such a nice streak! 👎</strong><br>
-                <strong>💚 Don't worry though, it's just a small setback.</strong><br>
-                <strong>🐄 Get right back to saving animals and unlock your achievements again!</strong>
-            </div>""", unsafe_allow_html=True)
+            negative_message = """
+                <div style='background-color:#f8d7da;padding:20px;border-radius:10px;border-left:5px solid red;'>
+                    <strong>🚨 Oh no! You ate meat after reaching such a nice streak! 👎</strong><br>
+                    <strong>💚 Don't worry though, it's just a small setback.</strong><br>
+                    <strong>🐄 Get right back to saving animals and unlock your achievements again!</strong>
+                </div>
+            """
             archived_achievements = active_achievements.copy()  # Move all active achievements to archived
             active_achievements.clear()  # Clear active achievements
-            recently_negative_achievement = True  # Flag to track negative achievement
 
         # --- Positive Achievement After Setback ---
-        if recently_negative_achievement and meat_events == 0:
+        if negative_message and meat_events == 0:
+            negative_message = None  # Reset the negative message once the user logs no meat
             st.markdown("""
                 <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
                     <strong>🌿 Great! You're back on track! Keep it up!</strong><br>
                 </div>
             """, unsafe_allow_html=True)
-            # Clear the negative achievement and reset the flag
-            archived_achievements.clear()  # Clear archived achievements (remove the negative one)
-            recently_negative_achievement = False  # Reset the flag
 
         # --- Display Active Achievements ---
         if active_achievements:
@@ -237,7 +236,6 @@ if username:
             file_name=f"{username}_meat_tracker_log.csv",
             mime='text/csv'
         )
-
 
 else:
     st.warning("Please enter your username in the sidebar to continue.")
