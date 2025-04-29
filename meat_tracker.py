@@ -157,6 +157,8 @@ if username:
                     <strong>🌿 Great! You're back on track! Keep it up!</strong><br>
                 </div>
             """, unsafe_allow_html=True)
+            # Clear the negative achievement and reset the flag
+            archived_achievements.clear()  # Clear archived achievements (remove the negative one)
             recently_negative_achievement = False  # Reset the flag
 
         # --- Display Active Achievements ---
@@ -183,48 +185,48 @@ if username:
             for achievement in archived_achievements:
                 st.markdown(f"🌿 {achievement}")
 
-        # --- Plotting (Bar Chart) ---
+        # --- Plotting (Bar Chart) --- 
         fig, ax = plt.subplots(figsize=(10, 6))
-
+        
         # Plot all days with grey bars (1 for unlogged)
         ax.bar(df_grouped_filled.index, df_grouped_filled.values, color='grey', alpha=0.6, label="Unlogged Day")
-
+        
         # Plotting the meat-eating events (green bars) on top of the grey bars
         ax.bar(df_grouped.index[df_grouped > 0], df_grouped[df_grouped > 0], color='green', label="Logged Meat Eating")
-
+        
         # Set labels for x and y axis
         ax.set_xlabel("Time")
         ax.set_ylabel("Meat-Eating Events")
         ax.tick_params(axis='y')
-
+        
         # Define weekly ticks (every 7 days, i.e., Mondays)
         weekly_ticks = pd.date_range(start=df_grouped_filled.index[0], end=df_grouped_filled.index[-1], freq='W-MON')
-
+        
         # Set the positions for the ticks and labels
         ax.set_xticks(df_grouped_filled.index)  # Set tick positions for each day
-
+        
         # Set the tick labels only for the weekly ticks (e.g., Mondays)
         ax.set_xticks(weekly_ticks)  # Position the weekly ticks on the x-axis
         ax.set_xticklabels(weekly_ticks.strftime('%Y-%m-%d'), rotation=45, ha='right')  # Only label the weekly ticks
-
+        
         # Minor ticks: Display small lines without labels
         ax.tick_params(axis='x', which='minor', length=4, width=1, color='black')
-
+        
         # Major ticks: Make them a bit longer for the weekly labels
         ax.tick_params(axis='x', which='major', length=7, width=2, color='black')
-
+        
         # Display legend and tight layout
         ax.legend()
-
+        
         # --- Y-Axis as Whole Numbers ---
         ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
-
+        
         # Tight layout for the plot
         plt.tight_layout()
-
+        
         # Show the plot
         st.pyplot(fig)
-
+        
         # --- Download Button ---
         df_download = df_grouped.reset_index()
         df_download.columns = ['date', 'count']
@@ -235,5 +237,7 @@ if username:
             file_name=f"{username}_meat_tracker_log.csv",
             mime='text/csv'
         )
+
+
 else:
     st.warning("Please enter your username in the sidebar to continue.")
