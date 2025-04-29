@@ -181,12 +181,6 @@ if username:
                             <strong>💚 Well done, keep it up! </strong> 🐄🐖🐥🐑🐟
                         </div>
                     """, unsafe_allow_html=True)
-        
-        # --- Display Archived Achievements ---
-        if archived_achievements:
-            st.markdown("### Archived Achievements")
-            for achievement in archived_achievements:
-                st.markdown(f"🌿 {achievement}")
 
         # --- Display Messages ---
         if negative_message:
@@ -194,6 +188,12 @@ if username:
         
         if positive_message:
             st.markdown(positive_message, unsafe_allow_html=True)
+        
+        # --- Display Archived Achievements ---
+        if archived_achievements:
+            st.markdown("### Archived Achievements")
+            for achievement in archived_achievements:
+                st.markdown(f"🌿 {achievement}")
 
         # --- Plotting ---
         fig, ax = plt.subplots(figsize=(10, 6))
