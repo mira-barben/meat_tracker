@@ -129,6 +129,7 @@ if username:
         active_achievements = []
         negative_message = None
 
+        
         # --- Meat-Free Calendar Weeks ---
         df_zero_filled = df_grouped.fillna(999)
         calendar_weeks = df_zero_filled.groupby([df_zero_filled.index.isocalendar().year, df_zero_filled.index.isocalendar().week])
@@ -136,19 +137,41 @@ if username:
         for _, week in calendar_weeks:
             if len(week) == 7 and all(week == 0):
                 meat_free_weeks += 1
-
-        # Add week achievements dynamically
-        for i in range(1, meat_free_weeks + 1):
-            active_achievements.append(f"{i}-week meat-free streak")
-
-        # Add streak achievements based on longest streak
+        
+        # --- Initialize Achievements ---
+        active_achievements = []
+        negative_message = None
+        
+        # --- Handle Meat-Free Week Achievement (single dynamic) ---
+        if meat_free_weeks > 0:
+            week_achievement_name = f"{meat_free_weeks}-week meat-free streak"
+        
+            # Remove any older week streak achievements from active
+            active_achievements = [ach for ach in active_achievements if "week meat-free streak" not in ach]
+        
+            # Move older week streaks to archived if present
+            archived_to_remove = []
+            for ach in st.session_state.archived_achievements:
+                if "week meat-free streak" in ach and ach != week_achievement_name:
+                    archived_to_remove.append(ach)
+            for ach in archived_to_remove:
+                st.session_state.archived_achievements.remove(ach)
+        
+            # Remove previous week streaks from archived
+            st.session_state.archived_achievements = [
+                ach for ach in st.session_state.archived_achievements if "week meat-free streak" not in ach or ach == week_achievement_name
+            ]
+        
+            active_achievements.append(week_achievement_name)
+        
+        # --- Add streak achievements based on longest streak ---
         for day, name in streak_achievements.items():
             if longest_streak >= day:
                 active_achievements.append(name)
-
+        
         # --- Handle Negative Achievement ---
         if df_grouped[df_grouped > 0].index.max() == today:
-            # Meat was eaten today, move all current active achievements to archived
+            # Meat was eaten today, move all active to archived
             st.session_state.archived_achievements = list(set(st.session_state.archived_achievements + active_achievements))
             active_achievements.clear()
             negative_message = """
@@ -159,17 +182,17 @@ if username:
                 </div>
             """
         else:
-            # Check if any achievements can be reactivated
+            # Reactivate achievements that are re-earned
             for achievement in st.session_state.archived_achievements.copy():
                 if achievement in active_achievements:
                     st.session_state.archived_achievements.remove(achievement)
-
-        # Remove now-active achievements from the archived list to prevent duplicates
+        
+        # Remove now-active achievements from the archived list
         archived_achievements = [
             ach for ach in st.session_state.archived_achievements
             if ach not in active_achievements
         ]
-
+        
         # --- Display Active Achievements ---
         if active_achievements:
             st.markdown("### Active Achievements")
@@ -179,7 +202,7 @@ if username:
                 elif achievement == "20-day streak":
                     st.success("🏅 20 days without meat! The pigs 🐖 are rooting for you!")
                 elif achievement == "30-day streak":
-                    st.success("🔥 30 days! You're a meatless machine! 🐔🐄")
+                    st.success("🔥 30 days! You're a legend! 🐔🐄")
                 elif achievement == "40-day streak":
                     st.success("💪 40 days? Incredible. Even the fish 🐟 are impressed.")
                 elif achievement == "50-day streak":
@@ -197,16 +220,17 @@ if username:
                             <strong>💚 Keep saving lives every week. 🐄🐖🐓🐟</strong>
                         </div>
                     """, unsafe_allow_html=True)
-
+        
         # --- Display Negative Message ---
         if negative_message:
             st.markdown(negative_message, unsafe_allow_html=True)
-
+        
         # --- Display Archived Achievements ---
         if archived_achievements:
             st.markdown("### Archived Achievements")
             for achievement in sorted(archived_achievements):
                 st.markdown(f"🌱 {achievement}")
+        
 
         # --- Plotting --- 
         fig, ax = plt.subplots(figsize=(10, 6))
