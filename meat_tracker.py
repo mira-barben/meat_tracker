@@ -244,7 +244,7 @@ if username:
                     week_count = achievement.split('-')[0]
                     st.markdown(f"""
                         <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
-                            <strong>🌿 {week_count} full calendar week(s) meat-free! Outstanding!</strong><br>
+                            <strong>🌿 {week_count} full calendar weeks meat-free! Outstanding!</strong><br>
                             <strong>💚 Keep saving lives every week. 🐄🐖🐓🐟</strong>
                         </div>
                     """, unsafe_allow_html=True)
