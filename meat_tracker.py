@@ -79,6 +79,26 @@ if username:
         st.sidebar.success(f"Saved {meat_events} event(s) for {selected_date.date()}!")
         st.rerun()
 
+        st.sidebar.markdown("---")
+        st.sidebar.subheader("Bulk Add No-Meat Days")
+        bulk_dates = st.sidebar.multiselect(
+            "Select multiple unlogged dates to mark as meat-free (0 events):",
+            options=unlogged_days.date,
+            format_func=lambda d: d.strftime("%Y-%m-%d")
+        )
+        
+        if st.sidebar.button("Save Selected Days as 0"):
+            for date in bulk_dates:
+                date = pd.to_datetime(date).normalize()
+                df = df[df['date'] != date]  # Remove existing entry if any
+                new_row = pd.DataFrame({'date': [date], 'count': [0]})
+                df = pd.concat([df, new_row], ignore_index=True)
+        
+            save_data(df, username, existing_file)
+            st.sidebar.success(f"Saved {len(bulk_dates)} zero-event day(s)!")
+            st.rerun()
+
+
     if not df.empty:
         df['date'] = pd.to_datetime(df['date']).dt.normalize()
         df_grouped = df.groupby('date')['count'].sum()
@@ -259,8 +279,18 @@ if username:
             st.markdown("### Archived Achievements")
             for achievement in sorted(archived_achievements):
                 st.markdown(f"🌱 {achievement}")
-        
 
+        
+         --- Identify Unlogged Days ---
+        unlogged_days = df_grouped[df_grouped.isna()].index
+        unlogged_df = pd.DataFrame(unlogged_days, columns=["Unlogged Dates"])
+        unlogged_df["Unlogged Dates"] = unlogged_df["Unlogged Dates"].dt.strftime("%Y-%m-%d")
+        
+        # --- Display the unlogged days in an expander ---
+        with st.expander("📅 Show unlogged days (no entry)"):
+            st.dataframe(unlogged_df, use_container_width=True)
+
+        
         # --- Plotting --- 
         fig, ax = plt.subplots(figsize=(10, 6))
         
