@@ -269,13 +269,12 @@ if username:
 
         st.markdown("## 📆 Bulk Mark No-Meat Days")
 
+        default_bulk = list(unlogged_days)  # unlogged_days is from earlier in your app
         bulk_selected_dates = st.date_input(
-            "Select multiple dates to mark as meat-free (0 events):",
-            [],
+            "Select multiple unlogged dates to mark as meat-free (0 events):",
+            default_bulk,
             format="YYYY-MM-DD",
-            key="bulk_date_picker",
-            help="Hold Ctrl (or Command) to select multiple days",
-            # multi=True is implied in newer Streamlit when the default is a list
+            key="bulk_date_picker"
         )
 
         if st.button("✅ Save Selected Days as 0"):
