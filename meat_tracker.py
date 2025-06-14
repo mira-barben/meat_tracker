@@ -137,7 +137,6 @@ if username:
         active_achievements = []
         negative_message = None
 
-        
         # --- Meat-Free Calendar Weeks ---
         df_zero_filled = df_grouped.fillna(999)
         calendar_weeks = df_zero_filled.groupby([df_zero_filled.index.isocalendar().year, df_zero_filled.index.isocalendar().week])
@@ -267,6 +266,31 @@ if username:
             st.markdown("### Archived Achievements")
             for achievement in sorted(archived_achievements):
                 st.markdown(f"🌱 {achievement}")
+
+        st.markdown("## 📆 Bulk Mark No-Meat Days")
+
+        bulk_selected_dates = st.date_input(
+            "Select multiple dates to mark as meat-free (0 events):",
+            [],
+            format="YYYY-MM-DD",
+            key="bulk_date_picker",
+            help="Hold Ctrl (or Command) to select multiple days",
+            # multi=True is implied in newer Streamlit when the default is a list
+        )
+
+        if st.button("✅ Save Selected Days as 0"):
+            if bulk_selected_dates:
+                for date in bulk_selected_dates:
+                    date = pd.to_datetime(date).normalize()
+                    df = df[df['date'] != date]  # Remove existing entry
+                    new_row = pd.DataFrame({'date': [date], 'count': [0]})
+                    df = pd.concat([df, new_row], ignore_index=True)
+        
+                save_data(df, username, existing_file)
+                st.success(f"Saved {len(bulk_selected_dates)} no-meat day(s)!")
+                st.rerun()
+            else:
+                st.warning("Please select at least one date.")
 
         
         # --- Identify Unlogged Days ---
