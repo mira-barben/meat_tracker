@@ -279,15 +279,15 @@ if username:
             st.dataframe(unlogged_df, use_container_width=True)
 
         if st.sidebar.button("Save Selected Days as 0"):
-        for date in bulk_dates:
-            date = pd.to_datetime(date).normalize()
-            df = df[df['date'] != date]  # Remove existing entry if any
-            new_row = pd.DataFrame({'date': [date], 'count': [0]})
-            df = pd.concat([df, new_row], ignore_index=True)
-    
-        save_data(df, username, existing_file)
-        st.sidebar.success(f"Saved {len(bulk_dates)} zero-event day(s)!")
-        st.rerun()
+            for date in bulk_dates:
+                date = pd.to_datetime(date).normalize()
+                df = df[df['date'] != date]  # Remove existing entry if any
+                new_row = pd.DataFrame({'date': [date], 'count': [0]})
+                df = pd.concat([df, new_row], ignore_index=True)
+        
+            save_data(df, username, existing_file)
+            st.sidebar.success(f"Saved {len(bulk_dates)} zero-event day(s)!")
+            st.rerun()
         
         # --- Plotting --- 
         fig, ax = plt.subplots(figsize=(10, 6))
