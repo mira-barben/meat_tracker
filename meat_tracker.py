@@ -86,18 +86,6 @@ if username:
             options=unlogged_days.date,
             format_func=lambda d: d.strftime("%Y-%m-%d")
         )
-        
-        if st.sidebar.button("Save Selected Days as 0"):
-            for date in bulk_dates:
-                date = pd.to_datetime(date).normalize()
-                df = df[df['date'] != date]  # Remove existing entry if any
-                new_row = pd.DataFrame({'date': [date], 'count': [0]})
-                df = pd.concat([df, new_row], ignore_index=True)
-        
-            save_data(df, username, existing_file)
-            st.sidebar.success(f"Saved {len(bulk_dates)} zero-event day(s)!")
-            st.rerun()
-
 
     if not df.empty:
         df['date'] = pd.to_datetime(df['date']).dt.normalize()
@@ -112,7 +100,7 @@ if username:
         # Set unlogged days (NaN) to 1 for grey bar representation
         df_grouped_filled = df_grouped.fillna(1)
 
-                # --- Track Active and Archived Achievements --- 
+        # --- Track Active and Archived Achievements --- 
         today = pd.Timestamp(datetime.today().date())
 
         # Initialize session state for persistent archived achievements
@@ -281,7 +269,7 @@ if username:
                 st.markdown(f"🌱 {achievement}")
 
         
-         --- Identify Unlogged Days ---
+        # --- Identify Unlogged Days ---
         unlogged_days = df_grouped[df_grouped.isna()].index
         unlogged_df = pd.DataFrame(unlogged_days, columns=["Unlogged Dates"])
         unlogged_df["Unlogged Dates"] = unlogged_df["Unlogged Dates"].dt.strftime("%Y-%m-%d")
@@ -290,6 +278,16 @@ if username:
         with st.expander("📅 Show unlogged days (no entry)"):
             st.dataframe(unlogged_df, use_container_width=True)
 
+        if st.sidebar.button("Save Selected Days as 0"):
+        for date in bulk_dates:
+            date = pd.to_datetime(date).normalize()
+            df = df[df['date'] != date]  # Remove existing entry if any
+            new_row = pd.DataFrame({'date': [date], 'count': [0]})
+            df = pd.concat([df, new_row], ignore_index=True)
+    
+        save_data(df, username, existing_file)
+        st.sidebar.success(f"Saved {len(bulk_dates)} zero-event day(s)!")
+        st.rerun()
         
         # --- Plotting --- 
         fig, ax = plt.subplots(figsize=(10, 6))
