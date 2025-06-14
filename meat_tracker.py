@@ -182,22 +182,21 @@ if username:
 
         # Convert to list of pd.Timestamp
         default_bulk = list(unlogged_days)
-        if default_bulk:
-            bulk_selected_dates = st.date_input(
-                "Select multiple unlogged dates:",
-                value=default_bulk,
-                key="bulk_date_picker"
-            )
-        else:
-            bulk_selected_dates = []
-
+        bulk_selected_dates = st.multiselect(
+            "Select multiple unlogged dates to mark as meat-free (0 events):",
+            options=default_bulk,
+            format_func=lambda d: d.strftime("%Y-%m-%d"),
+            default=default_bulk
+        )
+        
         if st.button("✅ Save Selected Days as 0"):
             if bulk_selected_dates:
                 for date in bulk_selected_dates:
                     date = pd.to_datetime(date).normalize()
-                    df = df[df['date'] != date]
+                    df = df[df['date'] != date]  # Remove existing entry
                     new_row = pd.DataFrame({'date': [date], 'count': [0]})
                     df = pd.concat([df, new_row], ignore_index=True)
+        
                 save_data(df, username, existing_file)
                 st.success(f"Saved {len(bulk_selected_dates)} no-meat day(s)!")
                 st.rerun()
