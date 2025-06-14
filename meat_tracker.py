@@ -99,8 +99,14 @@ if username:
             30: "30-day streak",
             40: "40-day streak",
             50: "50-day streak",
-            60: "60-day streak",
-            70: "70-day streak"
+            75: "75-day streak",
+            100: "100-day streak",
+            125: "125-day streak",
+            150: "150-day streak",
+            175: "175-day streak",
+            200: "200-day streak",
+            222: "222-day streak",
+            250: "250-day streak",
         }
 
         active_achievements = []
@@ -203,19 +209,19 @@ if username:
                             <strong>🔴 50 days meat-free! That's half a century of kindness. 🐄🐖🐓</strong>
                         </div>
                     """, unsafe_allow_html=True)
-                elif achievement == "60-day streak":
+                elif achievement == "75-day streak":
                     st.markdown("""
                         <div style='background-color:#e5dbff;padding:20px;border-radius:10px;border-left:5px solid #9775fa;'>
-                            <strong>🟣 60 days strong! The whole barn is cheering! 🐔🐷🐮🐑</strong>
+                            <strong>🟣 75 days strong! The whole barn is cheering! 🐔🐷🐮🐑</strong>
                         </div>
                     """, unsafe_allow_html=True)
-                elif achievement == "70-day streak":
+                elif achievement == "100-day streak":
                     st.balloons()
                     st.markdown("""
                         <div style='background-color:#f3d9fa;padding:20px;border-radius:10px;border-left:5px solid #da77f2;'>
-                            <strong>🌈 70 days! You're on another level. 🐄🐖🐓🐑🐟 Thank you from the animals.</strong>
+                            <strong>🌈 100 meat-free days! You're on another level. 🐄🐖🐓🐑🐟 Thank you from the animals.</strong>
                         </div>
-                    """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)                
                 elif "week meat-free streak" in achievement:
                     week_count = achievement.split('-')[0]
                     st.markdown(f"""
@@ -242,18 +248,15 @@ if username:
         unlogged_df = pd.DataFrame(unlogged_days, columns=["Unlogged Dates"])
         unlogged_df["Unlogged Dates"] = unlogged_df["Unlogged Dates"].dt.strftime("%Y-%m-%d")
 
-        #with st.expander("📅 Show unlogged days (no entry)"):
-            #st.dataframe(unlogged_df, use_container_width=True)
-
         st.sidebar.markdown("---")
-        st.sidebar.subheader("Bulk Add No-Meat Days")
+        st.sidebar.subheader("Bulk add No-Meat Days")
         bulk_dates = st.sidebar.multiselect(
             "Select multiple unlogged dates to mark as meat-free (0 events):",
             options=unlogged_days,
             format_func=lambda d: d.strftime("%Y-%m-%d")
         )
 
-        if st.sidebar.button("Save Selected Days as 0"):
+        if st.sidebar.button("Save selected days as 0"):
             for date in bulk_dates:
                 date = pd.to_datetime(date).normalize()
                 df = df[df['date'] != date]
