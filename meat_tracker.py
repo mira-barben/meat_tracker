@@ -156,8 +156,8 @@ if username:
         unlogged_df = pd.DataFrame(unlogged_days, columns=["Unlogged Dates"])
         unlogged_df["Unlogged Dates"] = unlogged_df["Unlogged Dates"].dt.strftime("%Y-%m-%d")
 
-        with st.expander("📅 Show unlogged days (no entry)"):
-            st.dataframe(unlogged_df, use_container_width=True)
+        #with st.expander("📅 Show unlogged days (no entry)"):
+            #st.dataframe(unlogged_df, use_container_width=True)
 
         st.sidebar.markdown("---")
         st.sidebar.subheader("Bulk Add No-Meat Days")
