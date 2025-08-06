@@ -214,14 +214,6 @@ if username:
         if negative_message:
             st.markdown(negative_message, unsafe_allow_html=True)
 
-        
-        # --- Display Archived Achievements ---
-        if archived_achievements:
-            st.markdown("### Archived Achievements")
-            for achievement in sorted(archived_achievements):
-                st.markdown(f"🌱 {achievement}")
-        
-
         # Identify Unlogged Days
         unlogged_days = df_grouped[df_grouped.isna()].index
         unlogged_df = pd.DataFrame(unlogged_days, columns=["Unlogged Dates"])
@@ -273,5 +265,6 @@ if username:
         )
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
 
 
