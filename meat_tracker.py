@@ -94,16 +94,12 @@ if username:
 
 # --- Define All Streak Achievements ---
         streak_achievements = {
-            10: "10-day streak",
-            20: "20-day streak",
-            30: "30-day streak",
-            40: "40-day streak",
-            50: "50-day streak",
-            75: "75-day streak",
             100: "100-day streak",
+            111: "111-day streak",
             125: "125-day streak",
             150: "150-day streak",
             175: "175-day streak",
+            183: "183-day streak"
             200: "200-day streak",
             222: "222-day streak",
             250: "250-day streak",
@@ -158,54 +154,54 @@ if username:
         if active_achievements:
             st.markdown("### Active Achievement")
             for achievement in active_achievements:
-                if achievement == "10-day streak":
+                if achievement == "100-day streak":
                     st.markdown("""
                         <div style='background-color:#d0ebff;padding:20px;border-radius:10px;border-left:5px solid #339af0;'>
-                            <strong>🔵 10-day streak! That cow 🐄 says thanks.</strong>
+                            <strong>🌈 100 meat-free days! You're on another level. 🐄🐖🐓🐑🐟 Thank you from the animals.</strong>
                         </div>
                     """, unsafe_allow_html=True)
-                elif achievement == "20-day streak":
+                elif achievement == "111-day streak":
                     st.markdown("""
                         <div style='background-color:#d3f9d8;padding:20px;border-radius:10px;border-left:5px solid #69db7c;'>
-                            <strong>🟢 20 days without meat! The pigs 🐖 are rooting for you!</strong>
+                            <strong>🌀 111 days! A magical repeating streak. The universe approves! ✨</strong>
                         </div>
                     """, unsafe_allow_html=True)
-                elif achievement == "30-day streak":
+                elif achievement == "125-day streak":
                     st.markdown("""
                         <div style='background-color:#fff3bf;padding:20px;border-radius:10px;border-left:5px solid #ffd43b;'>
-                            <strong>🟡 30 days! You're a legend! 🐔🐄</strong>
+                            <strong>💫 125 days! Your journey is inspiring. Every animal is cheering you on!/strong>
                         </div>
                     """, unsafe_allow_html=True)
-                elif achievement == "40-day streak":
+                elif achievement == "150-day streak":
                     st.markdown("""
                         <div style='background-color:#ffe0b2;padding:20px;border-radius:10px;border-left:5px solid #ffa94d;'>
-                            <strong>🟠 40 days? Incredible. Even the fish 🐟 are impressed.</strong>
+                            <strong>🔥 150 days! That’s dedication. The planet and animals thank you. 🌍🐷</strong>
                         </div>
                     """, unsafe_allow_html=True)
-                elif achievement == "50-day streak":
+                elif achievement == "175-day streak":
                     st.markdown("""
                         <div style='background-color:#ffc9c9;padding:20px;border-radius:10px;border-left:5px solid #ff6b6b;'>
-                            <strong>🔴 50 days meat-free! That's half a century of kindness. 🐄🐖🐓</strong>
+                            <strong>🌻 175 days meat-free! Your compassion is amazing 🌿</strong>
                         </div>
                     """, unsafe_allow_html=True)
-                elif achievement == "75-day streak":
+                elif achievement == "183-day streak":
                     st.markdown("""
                         <div style='background-color:#e5dbff;padding:20px;border-radius:10px;border-left:5px solid #9775fa;'>
-                            <strong>🟣 75 days strong! The whole barn is cheering! 🐔🐷🐮🐑</strong>
+                            <strong>🕊️ Half a year without meat! A milestone of true impact and commitment. 🐮💚</strong>
                         </div>
                     """, unsafe_allow_html=True)
-                elif achievement == "100-day streak":
+                elif achievement == "200-day streak":
                     st.balloons()
                     st.markdown("""
                         <div style='background-color:#f3d9fa;padding:20px;border-radius:10px;border-left:5px solid #da77f2;'>
-                            <strong>🌈 100 meat-free days! You're on another level. 🐄🐖🐓🐑🐟 Thank you from the animals.</strong>
+                            <strong>🎯 200 days! You’re a role model. That’s real, lasting change. 🐄🐖🐓</strong>
                         </div>
                     """, unsafe_allow_html=True)
                 elif "week meat-free streak" in achievement:
                     week_count = achievement.split('-')[0]
                     st.markdown(f"""
                         <div style='background-color:#d4edda;padding:20px;border-radius:10px;border-left:5px solid green;'>
-                            <strong>🌿 {week_count} full calendar week(s) meat-free! Outstanding!</strong><br>
+                            <strong>🌿 {week_count} full calendar weeks meat-free! Outstanding!</strong><br>
                             <strong>💚 Keep saving lives every week. 🐄🐖🐓🐟</strong>
                         </div>
                     """, unsafe_allow_html=True)
@@ -265,6 +261,7 @@ if username:
         )
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
 
 
 
