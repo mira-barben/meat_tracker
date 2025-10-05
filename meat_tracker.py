@@ -187,14 +187,15 @@ if username:
                 elif achievement == "183-day streak":
                     st.markdown("""
                         <div style='background-color:#e5dbff;padding:20px;border-radius:10px;border-left:5px solid #9775fa;'>
-                            <strong>🕊️ Half a year without meat! A milestone of true impact and commitment. 🐮💚</strong>
+                            <strong>💚183 Täg - es haubs Jahr! Wi cool isch ds!! </strong><br>
+                            <strong>💚I fröie mi so fescht bisch am dürezieh u i bi mega stouz uf di!💚</strong>
                         </div>
                     """, unsafe_allow_html=True)
-                elif achievement == "200-day streak":
+                elif achievement == "222-day streak":
                     st.balloons()
                     st.markdown("""
                         <div style='background-color:#f3d9fa;padding:20px;border-radius:10px;border-left:5px solid #da77f2;'>
-                            <strong>🎯 200 days! You’re a role model. That’s real, lasting change. 🐄🐖🐓</strong>
+                            <strong>🎯 222 Täg! Ds mues natürlech o spezieu füreghobe wärde😌 🐄🐖🐓</strong>
                         </div>
                     """, unsafe_allow_html=True)
                 elif "week meat-free streak" in achievement:
@@ -261,6 +262,7 @@ if username:
         )
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
 
 
 
