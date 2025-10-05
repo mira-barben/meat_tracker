@@ -100,7 +100,6 @@ if username:
             150: "150-day streak",
             175: "175-day streak",
             183: "183-day streak",
-            200: "200-day streak",
             222: "222-day streak",
             250: "250-day streak",
         }
@@ -262,6 +261,7 @@ if username:
         )
 else:
     st.warning("Please enter your username in the sidebar to continue.")
+
 
 
 
